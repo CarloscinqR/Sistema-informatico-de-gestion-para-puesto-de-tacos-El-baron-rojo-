@@ -1,4 +1,5 @@
 from tkinter import *
+import conexionBD
 
 def nuevo_producto_(menu_producto):
     menu_producto.destroy()
@@ -42,3 +43,54 @@ def nuevo_producto_(menu_producto):
     
     agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045")
     agregar.pack(padx=20, pady=10)
+
+class Productos_acciones:
+    def __init__(self,nombre,precio):
+        self._nombre=nombre
+        self._precio=precio
+
+    @property   
+    def nombre(self):
+        return self._nombre
+    @nombre.setter
+    def nombre(self, nombre):
+        self._nombre = nombre
+    @property
+    def precio(self):
+        return self._precio
+    @precio.setter
+    def precio(self, precio):
+        self._precio = precio
+
+    @staticmethod
+    def nuevo_product(product_name,unit_price):
+        try:
+            conexionBD.cursor.execute(
+                "insert into products values(%s,%s)",
+                (product_name,unit_price)
+            )
+            conexionBD.conexion.commit()
+            return True
+        except:
+            return False
+    @staticmethod
+    def ver_productos():
+        try:
+            conexionBD.cursor.execute("select * from products")
+            resultados=conexionBD.cursor.fetchall()
+            return resultados
+        except:
+            return False
+    @staticmethod
+    def modificar_producto(product_name,unit_price):
+        try:
+            conexionBD.cursor.execute(
+                "update products set nombre=%s, precio=%s where id_producto=%s",
+                (product_name,unit_price)
+            )
+            conexionBD.conexion.commit()
+            return True
+        except:
+            return False
+    
+        

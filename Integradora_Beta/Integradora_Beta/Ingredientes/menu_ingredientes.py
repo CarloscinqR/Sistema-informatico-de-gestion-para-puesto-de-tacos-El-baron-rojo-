@@ -22,16 +22,16 @@ def menu_ingrediente_(ventana_menu):
     contenedor_botones.pack_propagate(False)
     contenedor_botones.pack(padx=300, pady=20)
 
-    titulo=Label(contenedor_botones, text="ingredientes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
+    titulo=Label(contenedor_botones, text="Ingredientes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
     titulo.pack(padx=20, pady=20)
 
-    nuevoIngrediente=Button(contenedor_botones, text="NUEVO INGREDIENTE", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: nuevo_ingrediente_(menu_ingredientes))
+    nuevoIngrediente=Button(contenedor_botones, text="Nuevo Ingrediente", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: nuevo_ingrediente_(menu_ingredientes))
     nuevoIngrediente.pack(padx=20, pady=10, fill="x")
     
-    verIngrediente=Button(contenedor_botones, text="VER INGREDIENTES", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: ver_ingredientes_(menu_ingredientes))
+    verIngrediente=Button(contenedor_botones, text="Ver ingredientes", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: ver_ingredientes_(menu_ingredientes))
     verIngrediente.pack(padx=20, pady=10, fill="x")
 
-    modificarIngrediente=Button(contenedor_botones, text="MODIFICAR INGREDIENTE", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: modificar_ingrediente_(menu_ingredientes))
+    modificarIngrediente=Button(contenedor_botones, text="Modificar ingredientes", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: modificar_ingrediente_(menu_ingredientes))
     modificarIngrediente.pack(padx=20, pady=10, fill="x")
     
     def volver_al_menu_principal():
@@ -39,5 +39,5 @@ def menu_ingrediente_(ventana_menu):
         menu_ingredientes.destroy()
         menu_principal()
 
-    regresar=Button(contenedor_botones, text="REGRESAR", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=volver_al_menu_principal)
+    regresar=Button(contenedor_botones, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=volver_al_menu_principal)
     regresar.pack(padx=20, pady=10, fill="x")
