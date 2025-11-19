@@ -3,6 +3,7 @@ from Usuarios.nuevo_usuario import nuevo_usuario_
 from Usuarios.modificar_usuario import modificar_usuario_
 from Usuarios.ver_usuarios import ver_usuarios_
 
+
 def menu_usuario_(ventana_menu):
     ventana_menu.destroy()
     menu_usuarioss=Tk()
@@ -28,7 +29,7 @@ def menu_usuario_(ventana_menu):
     nuevoUsuario=Button(contenedor_botones, text="Nuevo usuario", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: nuevo_usuario_(menu_usuarioss))
     nuevoUsuario.pack(padx=20, pady=10, fill="x")
     
-    verUsuario=Button(contenedor_botones, text="Ver usuarios", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: ver_usuarios_(menu_usuarioss))
+    verUsuario=Button(contenedor_botones, text="Ver usuario", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: ver_usuarios_(menu_usuarioss))
     verUsuario.pack(padx=20, pady=10, fill="x")
 
     modificarUsuario=Button(contenedor_botones, text="Modificar usuario", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: modificar_usuario_(menu_usuarioss))
