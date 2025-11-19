@@ -25,7 +25,7 @@ def menu_ingrediente_(ventana_menu):
     titulo=Label(contenedor_botones, text="Ingredientes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
     titulo.pack(padx=20, pady=20)
 
-    nuevoIngrediente=Button(contenedor_botones, text="Nuevo Ingrediente", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: nuevo_ingrediente_(menu_ingredientes))
+    nuevoIngrediente=Button(contenedor_botones, text="Nuevo ingrediente", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: nuevo_ingrediente_(menu_ingredientes))
     nuevoIngrediente.pack(padx=20, pady=10, fill="x")
     
     verIngrediente=Button(contenedor_botones, text="Ver ingredientes", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: ver_ingredientes_(menu_ingredientes))

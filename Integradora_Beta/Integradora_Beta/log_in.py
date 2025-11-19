@@ -40,6 +40,7 @@ def log_in():
     ingresar=Button(contenedor_login, text="Ingresar", font=("Otomanopee One", 24), fg="#F1C045", bg="#A6171C", command=lambda: iniciar_sesion())
     ingresar.pack(side=BOTTOM)
 
+
     def iniciar_sesion():   
         #usuario_texto = usuario_entry.get()
         #contrasenia_texto = contrasenia_entry.get()

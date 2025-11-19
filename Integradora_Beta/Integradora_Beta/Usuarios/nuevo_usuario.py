@@ -1,7 +1,8 @@
 from tkinter import *
 import conexionBD
 import tkinter.messagebox as messagebox
-from metodos_usuarios import Usuarios_acciones
+# from metodos_usuarios import Usuarios_acciones
+# import metodos_usuarios
 
 def nuevo_usuario_(menu_usuario):
     menu_usuario.destroy()
@@ -35,7 +36,7 @@ def nuevo_usuario_(menu_usuario):
     nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white", textvariable=nombre)
     nombre_entry.pack(padx=20, pady=10)
 
-    contrasenia=Label(fondo3, text="contraseña", font=("Inter", 24), bg="white")
+    contrasenia=Label(fondo3, text="Contraseña", font=("Inter", 24), bg="white")
     contrasenia.pack(padx=20, pady=10)
 
     contrasenia=StringVar()
@@ -45,8 +46,8 @@ def nuevo_usuario_(menu_usuario):
     regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=volver_a_menu)
     regresar.pack(padx=20, pady=10)
     
-    agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045", command=Usuarios_acciones.agregar(nombre,contrasenia))
-    agregar.pack(padx=20, pady=10)
+    # agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045", command=metodos_suarios.Usuarios_acciones.agregar(nombre,contrasenia))
+    # agregar.pack(padx=20, pady=10)
 
 
     

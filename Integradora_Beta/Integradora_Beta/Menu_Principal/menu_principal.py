@@ -1,6 +1,6 @@
 from tkinter import *
 from Ordenes.menu_ordenes import menu_ordenes_
-from Prodcutos.menu_productos import menu_producto_
+from Productos.menu_productos import menu_producto_
 from Usuarios.menu_usuarios import menu_usuario_
 from Ingredientes.menu_ingredientes import menu_ingrediente_
 
@@ -37,7 +37,7 @@ def menu_principal():
     contenedor_botones2=Frame(contenedor_botones, bg="#A6171C")
     contenedor_botones2.pack()
 
-    salir=Button(contenedor_botones2, text="Salir", font=("Inter", 24), fg="#A6171C", bg="#F1C045")
+    salir=Button(contenedor_botones2, text="Salir", font=("Inter", 24), fg="#A6171C", bg="#F1C045",command=ventana_menu.quit())
     salir.pack(padx=20, pady=10, side=LEFT, fill="x")
 
     usuarios=Button(contenedor_botones2, text="Usuarios", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: menu_usuario_(ventana_menu))
