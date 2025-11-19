@@ -33,7 +33,11 @@ class menuingrediente():
         verIngrediente=Button(contenedor_botones, text="Ver ingredientes", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: veringredientes.ver_ingredientes_(menu_ingredientes))
         verIngrediente.pack(padx=20, pady=10, fill="x")
 
-        modificarIngrediente=Button(contenedor_botones, text="Modificar ingredientes", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: modificaringrediente.modificar_ingrediente_(menu_ingredientes))
+        def _on_modificar_click():
+            print("[DEBUG] boton 'Modificar ingredientes' pulsado en menu_ingredientes")
+            modificaringrediente.modificar_ingrediente_(menu_ingredientes)
+
+        modificarIngrediente=Button(contenedor_botones, text="Modificar ingredientes", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=_on_modificar_click)
         modificarIngrediente.pack(padx=20, pady=10, fill="x")
         
         def volver_al_menu_principal():
