@@ -22,12 +22,11 @@ class modificaringrediente():
         titulo.pack(padx=20, pady=20)
 
         fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True, fill="both")
-        fondo3.config(relief="solid", bd=1)
+        fondo3.pack(expand=True)
 
         def volver_a_menu():
-            from view.Ingredientes.menu_ingredientes import menuingrediente
-            menuingrediente.menu_ingrediente_(modificar_ingrediente)
+            from Ingredientes.menu_ingredientes import menu_ingrediente_
+            menu_ingrediente_(modificar_ingrediente)
 
         ingrediente_modificado=Label(fondo3, text="Selecciona el ingrediente a modificar", font=("Inter", 24), bg="white")
         ingrediente_modificado.pack(padx=20, pady=10)
@@ -105,11 +104,9 @@ class modificaringrediente():
         
         prodcutos_combo.bind('<<ComboboxSelected>>', on_select)
 
-        print("[DEBUG] creando boton 'Regresar' en modificar_ingrediente")
-        regresar=Button(fondo3, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=volver_a_menu)
-        regresar.config(relief="raised", bd=3)
-        regresar.pack(padx=20, pady=10, fill="x")
-        print("[DEBUG] boton 'Regresar' empaquetado")
+        #Este boton no aparece y no se porqué, puede ser por el pack...
+        regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=volver_a_menu)
+        regresar.pack(padx=20, pady=10)
         
         agregar=Button(fondo3, text="Modificar", font=("Inter", 24), bg="#F1C045")
         agregar.pack(padx=20, pady=10)
