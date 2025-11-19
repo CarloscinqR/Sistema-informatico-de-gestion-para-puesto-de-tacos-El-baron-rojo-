@@ -1,6 +1,6 @@
-from log_in import log_in
+from view.log_in import login
 import os
 
 os.system("cls")
 
-log_in()
+login.log_in()
