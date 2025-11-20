@@ -20,7 +20,7 @@ class menuusuario():
         fondo2.pack_propagate(False)
         fondo2.pack(padx=99, pady=50)
 
-        contenedor_botones=Frame(fondo2, bg="white", width=550, height=790)
+        contenedor_botones=Frame(fondo2, bg="#A6171C", width=550, height=790)
         contenedor_botones.pack_propagate(False)
         contenedor_botones.pack(padx=300, pady=20)
 
@@ -43,3 +43,4 @@ class menuusuario():
 
         regresar=Button(contenedor_botones, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=volver_al_menu_principal)
         regresar.pack(padx=20, pady=10, fill="x")
+
