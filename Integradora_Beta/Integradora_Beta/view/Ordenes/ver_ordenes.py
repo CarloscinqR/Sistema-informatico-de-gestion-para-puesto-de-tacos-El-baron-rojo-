@@ -16,7 +16,7 @@ class verordenes():
         fondo2.pack_propagate(False)
         fondo2.pack(padx=99, pady=50)
 
-        contenedor_botones=Frame(fondo2, bg="white", width=550, height=790)
+        contenedor_botones=Frame(fondo2, bg="#A6171C", width=550, height=790)
         contenedor_botones.pack_propagate(False)
         contenedor_botones.pack(padx=300, pady=20)
 
@@ -35,3 +35,4 @@ class verordenes():
 
         regresar=Button(contenedor_botones, text="Regresar", font=("Inter", 24), bg="#F1C045", command=volver_a_menu)
         regresar.pack(padx=20, pady=10)
+
