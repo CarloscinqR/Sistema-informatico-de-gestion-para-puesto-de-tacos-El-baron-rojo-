@@ -46,11 +46,28 @@ class interfacesProducto():
 
         # Agrego columna 'Acciones' para mostrar opciones sutiles por fila
         columns = ('Id_producto', 'Nombre_producto', 'Precio_unitario', 'Acciones')
-        tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='headings', selectmode='browse')
-        tabla.heading('Id_producto', text='Id_producto')
-        tabla.heading('Nombre_producto', text='Nombre_producto')
-        tabla.heading('Precio_unitario', text='Precio_unitario')
-        tabla.heading('Acciones', text='Acciones')
+
+        # Encabezado personalizado: uso Labels en lugar de los headings del Treeview
+        header_frame = Frame(contenedor_tabla, bg='#A6171C')
+        header_frame.pack(fill='x', padx=20, pady=(10, 0))
+        # Mantener proporciones similares a las columnas del Treeview
+        header_frame.columnconfigure(0, weight=120)
+        header_frame.columnconfigure(1, weight=480)
+        header_frame.columnconfigure(2, weight=160)
+        header_frame.columnconfigure(3, weight=180)
+
+        lbl_h_id = Label(header_frame, text='Id_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
+        lbl_h_nombre = Label(header_frame, text='Nombre_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
+        lbl_h_precio = Label(header_frame, text='Precio_unitario', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
+        lbl_h_acciones = Label(header_frame, text='Acciones', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
+
+        lbl_h_id.grid(row=0, column=0, sticky='we', padx=(4,2))
+        lbl_h_nombre.grid(row=0, column=1, sticky='we', padx=2)
+        lbl_h_precio.grid(row=0, column=2, sticky='we', padx=2)
+        lbl_h_acciones.grid(row=0, column=3, sticky='we', padx=(2,4))
+
+        # Crear Treeview sin mostrar los headings nativos (los reemplazamos por Labels)
+        tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='', selectmode='browse')
         tabla.column('Id_producto', width=120, anchor=CENTER)
         tabla.column('Nombre_producto', width=480, anchor=W)
         tabla.column('Precio_unitario', width=160, anchor=E)
