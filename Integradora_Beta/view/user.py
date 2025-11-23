@@ -1,7 +1,8 @@
 from tkinter import *
 from view import menu_principal
-from tkinter import ttk
+from tkinter import ttk,messagebox,simpledialog
 from model import metodos_usuarios
+from controller import funciones
 
 class interfacesUsuario():
     def __init__(self,menu_usuarios):
@@ -83,6 +84,53 @@ class interfacesUsuario():
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
+        def on_borrar(iid, uid, uname):
+            confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el usuario?\nID: {uid}\nNombre: {uname}")
+            if not confirm:
+                return
+
+            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para eliminar:", show='*', parent=menu_usuarios)
+            if pwd is None:
+                return
+            if pwd != '1234':
+                messagebox.showerror("Error", "Contraseña incorrecta.")
+                return
+
+            eliminado = metodos_usuarios.Usuarios_acciones.borrar(uid)
+            if eliminado:
+                messagebox.showinfo("Éxito", "Usuario eliminado correctamente.")
+                try:
+                    b_ed, b_del = _row_buttons.pop(iid, (None, None))
+                    if b_ed:
+                        try:
+                            b_ed.destroy()
+                        except Exception:
+                            pass
+                    if b_del:
+                        try:
+                            b_del.destroy()
+                        except Exception:
+                            pass
+                    try:
+                        tabla.delete(iid)
+                    except Exception:
+                        pass
+                    try:
+                        reposition_buttons()
+                    except Exception:
+                        pass
+                except Exception:
+                    pass
+            else:
+                messagebox.showerror("Error", "No se pudo eliminar al usuario. Verifique la conexión o los datos.")
+        
+        def on_editar(iid, uid, uname, upassw,urol):
+            # Abrir la vista de modificación pre-llenada con los datos seleccionados
+            try:
+                self.modificarUsuario(menu_usuarios, (uid,uname,upassw,urol))
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
+
         for i, user in enumerate(usuarios):
             # producto es una tupla (id_prduct, prduct_name, unit_price)
             tag = 'even' if i % 2 == 0 else 'odd'
@@ -91,8 +139,8 @@ class interfacesUsuario():
 
             # Crear botones visibles sobre la Treeview en la columna 'Acciones'
             # Los botones no tienen comando (no funcionales)
-            btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
-            btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
+            btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1], upassw=user[2],urol=user[6]: on_editar(iid, uid, uname, upassw,urol))
+            btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1]: on_borrar(iid, uid, uname))
             _row_buttons[item_id] = (btn_editar, btn_borrar)
 
         # Forzar dibujo y posicionar los botones sobre cada celda 'Acciones'
@@ -130,7 +178,7 @@ class interfacesUsuario():
         except Exception:
             pass
 
-        btn_agregarProducto=Button(contenedor_tabla, text="Agregar producto", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(menu_usuarios), width=22)
+        btn_agregarProducto=Button(contenedor_tabla, text="Agregar usuario", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevoUsuario(menu_usuarios), width=22)
         btn_agregarProducto.pack(padx=20, pady=10, fill="x", side=LEFT)
 
         btn_regresar=Button(contenedor_tabla, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(menu_usuarios), width=22)
@@ -159,24 +207,34 @@ class interfacesUsuario():
         lbl_nombre=Label(fondo3, text="Nombre", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
         
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        nomb=StringVar()
+        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=nomb)
         nombre_entry.pack(padx=20, pady=10)
 
         lbl_contrasenia=Label(fondo3, text="contraseña", font=("Inter", 24), bg="white")
         lbl_contrasenia.pack(padx=20, pady=10)
 
-        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        contr=StringVar()
+        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr)
         contrasenia_entry.pack(padx=20, pady=10)
+
+        lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
+        lbl_rol.pack(padx=20, pady=10)
+
+        rol=StringVar()
+        rol_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=rol)
+        rol_entry.pack(padx=20, pady=10)
+        
 
         btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
         btn_regresar.pack(padx=20, pady=10)
         
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045")
+        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),rol.get())))
         btn_agregar.pack(padx=20, pady=10)
 
-    def modificarUsuario(self,modificar_usuario):
+    def modificarUsuario(self,modificar_usuario,usuario=None):
         self.borrarPantalla(modificar_usuario)
-        modificar_usuario.title("Modificar usuario")
+        modificar_usuario.title("Modificar Usuario")
         modificar_usuario.geometry("1920x1080")
         modificar_usuario.state("zoomed")
 
@@ -188,52 +246,77 @@ class interfacesUsuario():
         fondo2.pack_propagate(False)
         fondo2.pack(padx=99, pady=50)
 
-        lbl_titulo=Label(fondo2, text="Modificar usuarios",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
+        lbl_titulo=Label(fondo2, text="Modificar Usuario",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
         lbl_titulo.pack(padx=20, pady=20)
 
         fondo3=Frame(fondo2, bg="white", height=180)
         fondo3.pack(expand=True)
 
-        def volver_a_menu():
-            pass
+        uid = None
+        initial_name = ""
+        initial_passw=""
+        initial_rol = ""
+        if usuario:
+            try:
+                uid = usuario[0]
+                initial_name = usuario[1]
+                initial_passw=usuario[2]
+                initial_rol = usuario[3]
+            except Exception:
+                uid = None
 
-        lbl_usuario_modificado=Label(fondo3, text="Selecciona el usuario a modificar", font=("Inter", 24), bg="white")
-        lbl_usuario_modificado.pack(padx=20, pady=10)
-
-        usuarios=[
-            "Usuario 1",
-            "Usuario 2",
-            "Usuario 3",
-            "usuario 4"
-        ]
-
-        usuario_modificado_combo=ttk.Combobox(fondo3, values=usuarios, font=("Inter", 24))
-        usuario_modificado_combo.set("Selecciona un usuario")
-        usuario_modificado_combo.pack(padx=20, pady=10)
-
-        def on_select(event):
-            print("usuarios seleccionado:", usuario_modificado_combo.get())
-        
-        usuario_modificado_combo.bind('<<ComboboxSelected>>', on_select)
-
-
-        lbl_nombre=Label(fondo3, text="Nuevo nombre", font=("Inter", 24), bg="white")
+        lbl_nombre=Label(fondo3, text="Nuevo nombre del usuario", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
         
         nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        nombre_entry.insert(0, initial_name)
         nombre_entry.pack(padx=20, pady=10)
 
-        lbl_contrasenia=Label(fondo3, text="Nueva contraseña", font=("Inter", 24), bg="white")
-        lbl_contrasenia.pack(padx=20, pady=10)
+        lbl_passw=Label(fondo3, text="Nueva contraseña", font=("Inter", 24), bg="white")
+        lbl_passw.pack(padx=20, pady=10)
 
-        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white")
-        contrasenia_entry.pack(padx=20, pady=10)
+        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        passw_entry.insert(0, initial_passw)
+        passw_entry.pack(padx=20, pady=10)
+
+        lbl_rol=Label(fondo3, text="Nuevo rol", font=("Inter", 24), bg="white")
+        lbl_rol.pack(padx=20, pady=10)
+
+        rol_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        rol_entry.insert(0, initial_rol)
+        rol_entry.pack(padx=20, pady=10)
+
+        def on_modificar():
+            nonlocal uid
+            nuevo_nombre = nombre_entry.get().strip()
+            passw_text = passw_entry.get().strip()
+            rol_text=rol_entry.get().strip()
+            if not nuevo_nombre:
+                messagebox.showerror("Error", "El nombre no puede estar vacío.")
+                return
+            if uid is None:
+                messagebox.showerror("Error", "Id del usuario desconocido. No se puede modificar.")
+                return
+            # Pedir contraseña antes de modificar
+            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_usuario)
+            if pwd is None:
+                return
+            if pwd != '1234':
+                messagebox.showerror("Error", "Contraseña incorrecta.")
+                return
+
+            modificado = metodos_usuarios.Usuarios_acciones.modificar_usuario(nuevo_nombre, passw_text,rol_text,uid)
+            if modificado:
+                messagebox.showinfo("Éxito", "Usuario modificado correctamente.")
+                self.menu_usuario(modificar_usuario)
+            else:
+                messagebox.showerror("Error", "No se pudo modificar al usuario. Verifique la conexión o los datos.")
+
+        btn_agregar=Button(fondo3, text="Modificar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
+        btn_agregar.pack(padx=20, pady=10)
 
         btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(modificar_usuario))
         btn_regresar.pack(padx=20, pady=10)
-        
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045")
-        btn_agregar.pack(padx=20, pady=10)
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
