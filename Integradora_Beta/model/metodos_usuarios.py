@@ -1,15 +1,17 @@
 import conexionBD
 from tkinter import *
 from tkinter import messagebox
+import hashlib
 
 
 class Usuarios_acciones():
     @staticmethod
     def agregar(username,password,role):
         try:
+            password=hashlib.sha256(password.encode()).hexdigest()
             conexionBD.cursor.execute(
-                "insert into user (username,password,creation_date,delete_date,status,role) values (null,%s, %s,NOW(),0000-00-00,1,%s)",
-                (username,password,role,)
+                "insert into user (id_user,username,password,creation_date,delete_date,status,role) values (null,%s, %s,NOW(),0000-00-00,1,%s)",
+                (username,password,role)
             )
             conexionBD.conexion.commit()
             return True
@@ -41,13 +43,29 @@ class Usuarios_acciones():
             return []
 
     @staticmethod
-    def modificar_usuario(id_product, nuevo_nombre, nuevo_precio):
+    def modificar_usuario(nuevo_nombre, nueva_pass,nuevo_rol,id_user):
         try:
             conexionBD.cursor.execute(
-                "UPDATE products SET prduct_name=%s, unit_price=%s WHERE id_prduct=%s",
-                (nuevo_nombre, nuevo_precio, id_product)
+                "UPDATE user SET username=%s, password=%s, role=%s WHERE id_user=%s",
+                (nuevo_nombre, nueva_pass, nuevo_rol,id_user)
             )
             conexionBD.conexion.commit()
             return True
         except:
+            return False
+            
+    @staticmethod
+    def borrar(id_user):
+        try:
+            conexionBD.cursor.execute(
+                "delete from user where id_user=%s",
+                (id_user,)
+            )
+            conexionBD.conexion.commit()
+            # Si rowcount > 0, se eliminó algo
+            try:
+                return conexionBD.cursor.rowcount > 0
+            except Exception:
+                return True
+        except Exception:
             return False

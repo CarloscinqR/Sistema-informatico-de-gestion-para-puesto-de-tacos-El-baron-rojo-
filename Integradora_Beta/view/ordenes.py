@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from view import menu_principal
 from model import metodos_ordenes
+from controller import funciones
 #Falta eliminar y el modificar de este CRUD
 class interfacesOrdenes():
     def __init__(self,ventana_ordenes):
@@ -9,7 +10,6 @@ class interfacesOrdenes():
         ventana_ordenes.geometry("1920x1080")
         ventana_ordenes.state("zoomed")
         self.menu_ordenes(ventana_ordenes)
-        print(metodos_ordenes.Ordenes_acciones.mostrar_ordenes())
 
     def borrarPantalla(self,ventana_login):
         for widget in ventana_login.winfo_children():
@@ -25,7 +25,7 @@ class interfacesOrdenes():
         fondo2.pack_propagate(False)
         fondo2.pack(padx=99, pady=50)
 
-        lbl_titulo=Label(fondo2, text="Productos",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
+        lbl_titulo=Label(fondo2, text="Ordenes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
         lbl_titulo.pack(padx=20, pady=20)
 
         contenedor_tabla=Frame(fondo2, width=2000, height=790)
@@ -55,7 +55,7 @@ class interfacesOrdenes():
         tabla.heading('Acciones', text='Acciones')
         tabla.column('Id_orden', width=120, anchor=CENTER)
         tabla.column('Fecha', width=160, anchor=CENTER)
-        tabla.column('Total', width=160, anchor=E)
+        tabla.column('Total', width=160, anchor=CENTER)
         tabla.column('Cliente', width=160, anchor=W)
         tabla.column('Acciones', width=180, anchor=CENTER)
 
@@ -78,20 +78,20 @@ class interfacesOrdenes():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        productos = metodos_ordenes.Ordenes_acciones.mostrar_ordenes()
+        ordenes = metodos_ordenes.Ordenes_acciones.obtener_ordenes()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
-        for i, producto in enumerate(productos):
+        for i, orden in enumerate(ordenes):
             # producto es una tupla (id_prduct, prduct_name, unit_price)
-            precio = producto[2]
+            total = orden[2]
             try:
-                precio_text = f"{float(precio):.2f} MXN"
+                total_text = f"{float(total):.2f} MXN"
             except Exception:
-                precio_text = str(precio)
+                total_text = str(total)
             tag = 'even' if i % 2 == 0 else 'odd'
             # Insertar fila en la tabla (sin funciones)
-            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], precio_text, ''), tags=(tag,))
+            item_id = tabla.insert('', 'end', values=(orden[0], orden[1], total_text,orden[3], ''), tags=(tag,))
 
             # Crear botones visibles sobre la Treeview en la columna 'Acciones'
             # Los botones no tienen comando (no funcionales)
@@ -134,7 +134,7 @@ class interfacesOrdenes():
         except Exception:
             pass
 
-        btn_agregarProducto=Button(contenedor_tabla, text="Agregar producto", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(ventana_ordenes), width=22)
+        btn_agregarProducto=Button(contenedor_tabla, text="Agregar producto", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevaOrden(ventana_ordenes), width=22)
         btn_agregarProducto.pack(padx=20, pady=10, fill="x", side=LEFT)
 
         btn_regresar=Button(contenedor_tabla, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(ventana_ordenes), width=22)

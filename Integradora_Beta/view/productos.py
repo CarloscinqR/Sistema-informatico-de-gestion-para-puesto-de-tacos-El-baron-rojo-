@@ -269,7 +269,6 @@ class interfacesProducto():
         btn_agregar.pack(padx=20, pady=10)
 
     def modificarProducto(self, modificar_producto, producto=None):
- 
         self.borrarPantalla(modificar_producto)
         modificar_producto.title("Modificar producto")
         modificar_producto.geometry("1920x1080")
