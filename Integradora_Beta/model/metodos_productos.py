@@ -5,14 +5,16 @@ from tkinter import messagebox
 
 class Productos_acciones():
     @staticmethod
-    def agregar(prduct_name,unit_price,id_product):
+    def agregar(prduct_name,unit_price,id_product=None):
         try:
             conexionBD.cursor.execute(
-                "insert into products (id_prduct,prduct_name,unit_price) values (%s,%s, %s)",
+                "insert into products (id_product,product_name,unit_price) values (%s,%s, %s)",
                 (id_product,prduct_name, unit_price,)
             )
             conexionBD.conexion.commit()
             return True
+
+        
         except:
             return False
         
@@ -41,13 +43,29 @@ class Productos_acciones():
             return []
 
     @staticmethod
-    def modificar_producto(id_product, nuevo_nombre, nuevo_precio):
+    def modificar_producto(nuevo_nombre, nuevo_precio,id_product=None):
         try:
             conexionBD.cursor.execute(
-                "UPDATE products SET prduct_name=%s, unit_price=%s WHERE id_prduct=%s",
+                "UPDATE products SET product_name=%s, unit_price=%s WHERE id_product=%s",
                 (nuevo_nombre, nuevo_precio, id_product)
             )
             conexionBD.conexion.commit()
             return True
         except:
+            return False
+        
+    @staticmethod
+    def borrar(id_product):
+        try:
+            conexionBD.cursor.execute(
+                "DELETE FROM products WHERE id_product=%s",
+                (id_product,)
+            )
+            conexionBD.conexion.commit()
+            # Si rowcount > 0, se eliminó algo
+            try:
+                return conexionBD.cursor.rowcount > 0
+            except Exception:
+                return True
+        except Exception:
             return False
