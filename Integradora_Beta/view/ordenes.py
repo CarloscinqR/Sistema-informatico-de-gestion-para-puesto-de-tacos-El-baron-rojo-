@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from view import menu_principal
-from model import metodos_ordenes
+from model import metodos_ordenes,metodos_productos
 from controller import funciones
 #Falta eliminar y el modificar de este CRUD
 class interfacesOrdenes():
@@ -156,7 +156,7 @@ class interfacesOrdenes():
         btn_regresar=Button(header, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.menu_ordenes(nueva_orden))
         btn_regresar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
-        btn_alimentos=Button(header, text="Alimentos", font=("Inter", 24), fg="#A6171C", bg="#F1C045")
+        btn_alimentos=Button(header, text="Alimentos", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesAlimentos(contenedor_botones_productos))
         btn_alimentos.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
         btn_especiales=Button(header, text="Especiales", font=("Inter", 24), fg="#A6171C", bg="#F1C045")
@@ -169,8 +169,36 @@ class interfacesOrdenes():
         btn_confirmar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
 
         contenedor_botones_productos=Frame(fondo, bg="#D6D0C5")
-        contenedor_botones_productos.grid()
+        contenedor_botones_productos.pack(pady=10, padx=10, fill="both", expand=True, side=LEFT)
 
+        #Falta que funcione el registro de ordenes
+        contenedor_orden=Frame(fondo,bg="#EAEAE9",width=300)
+        contenedor_orden.pack_propagate(False)
+        contenedor_orden.pack(pady=10, padx=10, fill="y", side=RIGHT)
+
+        titulo_orden=Label(contenedor_orden, bg="#EAEAE9", font=46, text="Orden:")
+        titulo_orden.pack(pady=5)
+        nombre_comprador=Label(contenedor_orden, bg="#EAEAE9", font=5, text="Nombre del Cliente:")
+        nombre_comprador.pack(pady=5)
+        nombre=Entry(contenedor_orden, bg="#EAEAE9")
+        nombre.pack(fill="y", padx=5, pady=5)
+
+    def botonesAlimentos(self,contenedor_botones_productos):
+            #El metodo determina qué se muestra, falta que se ponga en cada categoría
+            productos=metodos_productos.Productos_acciones.obtener_productos()
+            maximo=3
+            for c in range(maximo):
+                contenedor_botones_productos.grid_columnconfigure(c, weight=1)
+            filas=(len(productos)+maximo-1)//maximo
+            for r in range(filas):
+                contenedor_botones_productos.grid_rowconfigure(r, weight=1)
+            
+            for i,producto in enumerate(productos):
+                fila=i//maximo
+                columna=i%maximo
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=20, command= lambda:"")
+                boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
+    
     def verOrdenes(self,ver_ordenes):
         self.borrarPantalla(ver_ordenes)
         ver_ordenes.title("Ver ordenes")
@@ -203,5 +231,6 @@ class interfacesOrdenes():
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
+
 
     
