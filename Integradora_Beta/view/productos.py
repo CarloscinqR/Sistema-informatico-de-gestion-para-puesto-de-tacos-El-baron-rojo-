@@ -264,11 +264,27 @@ class interfacesProducto():
                 self.menu_producto(nuevo_producto)
             else:
                 messagebox.showerror("Error", "No se pudo agregar el producto. Revisa la conexión o los datos.")
+        
+        marco=Frame(fondo3, bg="white")
+
+        ingrediente1=Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white")
+        ingrediente1.grid(row=0, column=0, padx=20, pady=5)
+        ingrediente2=Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white")
+        ingrediente2.grid(row=0, column=1, padx=20, pady=5)
+        ingrediente3=Checkbutton(marco, text="Carnde asada", font=("Inter", 18), bg="white")
+        ingrediente3.grid(row=0, column=2, padx=20, pady=5)
+        ingrediente4=Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white")
+        ingrediente4.grid(row=1, column=0, padx=20, pady=5)
+        ingrediente5=Checkbutton(marco, text="Quesp", font=("Inter", 18), bg="white")
+        ingrediente5.grid(row=1, column=1, padx=20, pady=5)
+        marco.pack(padx=20, pady=10)
+
 
         btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045", command=on_agregar)
         btn_agregar.pack(padx=20, pady=10)
 
     def modificarProducto(self, modificar_producto, producto=None):
+ 
         self.borrarPantalla(modificar_producto)
         modificar_producto.title("Modificar producto")
         modificar_producto.geometry("1920x1080")
