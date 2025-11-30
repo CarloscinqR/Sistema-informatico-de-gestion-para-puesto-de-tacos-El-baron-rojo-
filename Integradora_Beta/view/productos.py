@@ -45,8 +45,8 @@ class interfacesProducto():
                         font=('Orelega One', 16))
         style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
 
-        # Agrego columna 'Acciones' para mostrar opciones sutiles por fila
-        columns = ('Id_producto', 'Nombre_producto', 'Precio_unitario', 'Acciones')
+        # Agrego columna 'Categoria' y 'Acciones' para mostrar opciones por fila
+        columns = ('Id_producto', 'Nombre_producto', 'Categoria', 'Precio_unitario', 'Acciones')
 
         # Encabezado personalizado: uso Labels en lugar de los headings del Treeview
         header_frame = Frame(contenedor_tabla, bg='#A6171C')
@@ -55,17 +55,20 @@ class interfacesProducto():
         header_frame.columnconfigure(0, weight=120)
         header_frame.columnconfigure(1, weight=480)
         header_frame.columnconfigure(2, weight=160)
-        header_frame.columnconfigure(3, weight=180)
+        header_frame.columnconfigure(3, weight=160)
+        header_frame.columnconfigure(4, weight=180)
 
-        lbl_h_id = Label(header_frame, text='Id_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
-        lbl_h_nombre = Label(header_frame, text='Nombre_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
-        lbl_h_precio = Label(header_frame, text='Precio_unitario', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
-        lbl_h_acciones = Label(header_frame, text='Acciones', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16))
+        lbl_h_id = Label(header_frame, text='Id_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
+        lbl_h_nombre = Label(header_frame, text='Nombre_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='w')
+        lbl_h_categoria = Label(header_frame, text='Categoría', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
+        lbl_h_precio = Label(header_frame, text='Precio_unitario', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='e')
+        lbl_h_acciones = Label(header_frame, text='Acciones', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
 
         lbl_h_id.grid(row=0, column=0, sticky='we', padx=(4,2))
         lbl_h_nombre.grid(row=0, column=1, sticky='we', padx=2)
-        lbl_h_precio.grid(row=0, column=2, sticky='we', padx=2)
-        lbl_h_acciones.grid(row=0, column=3, sticky='we', padx=(2,4))
+        lbl_h_categoria.grid(row=0, column=2, sticky='we', padx=2)
+        lbl_h_precio.grid(row=0, column=3, sticky='we', padx=2)
+        lbl_h_acciones.grid(row=0, column=4, sticky='we', padx=(2,4))
 
         # Crear Treeview sin mostrar los headings nativos (los reemplazamos por Labels)
         # Nota: ocultamos los headings nativos con `show=''` porque queremos
@@ -77,6 +80,7 @@ class interfacesProducto():
         tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='', selectmode='browse')
         tabla.column('Id_producto', width=120, anchor=CENTER)
         tabla.column('Nombre_producto', width=480, anchor=W)
+        tabla.column('Categoria', width=160, anchor=CENTER)
         tabla.column('Precio_unitario', width=160, anchor=E)
         tabla.column('Acciones', width=180, anchor=CENTER)
 
@@ -144,26 +148,32 @@ class interfacesProducto():
                 messagebox.showerror("Error", "No se pudo eliminar el producto. Verifique la conexión o los datos.")
 
         # Handler para editar un producto: abre la interfaz de modificarProducto
-        def on_editar(iid, pid, pname, pprice):
-            # Abrir la vista de modificación pre-llenada con los datos seleccionados
+        def on_editar(iid, producto_tuple):
+            # Abrir la vista de modificación pre-llenada con la tupla completa
+            # (id, nombre, precio, [categoria]) — si existe categoría la
+            # pasamos para que el formulario se precargue.
             try:
-                self.modificarProducto(menu_productos, (pid, pname, pprice))
+                self.modificarProducto(menu_productos, producto_tuple)
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
 
         for i, producto in enumerate(productos):
-            precio = producto[2]
+            # DB order: id_product, product_name, products_category, unit_price
+            # price is at index 3
+            precio = producto[3]
             try:
                 precio_text = f"{float(precio):.2f} MXN"
             except Exception:
                 precio_text = str(precio)
             tag = 'even' if i % 2 == 0 else 'odd'
             # Insertar fila en la tabla (sin funciones)
-            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], precio_text, ''), tags=(tag,))
+            # producto tuple order: (id_product, product_name, products_category, unit_price)
+            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], producto[2], precio_text, ''), tags=(tag,))
 
             btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
             btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
-            btn_editar.config(command=lambda iid=item_id, pid=producto[0], pname=producto[1], pprice=producto[2]: on_editar(iid, pid, pname, pprice))
+            # pass full producto tuple to the editor so it can populate category
+            btn_editar.config(command=lambda iid=item_id, prod=producto: on_editar(iid, prod))
             btn_borrar.config(command=lambda iid=item_id, pid=producto[0], pname=producto[1]: on_borrar(iid, pid, pname))
             _row_buttons[item_id] = (btn_editar, btn_borrar)
 
@@ -226,24 +236,105 @@ class interfacesProducto():
         lbl_titulo=Label(fondo2, text="Nuevo producto",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
         lbl_titulo.pack(padx=20, pady=20)
 
-        fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True)
+        # white area that should be scrollable when its contents overflow
+        # Keep this white area centered and with a constrained width so it
+        # doesn't occupy the whole red panel. The height will be adjusted
+        # to reach the bottom of the red frame (fondo2) while still leaving
+        # the title visible at the top.
+        desired_width = 1200
+        fondo3 = Frame(fondo2, bg="white", width=desired_width, height=700)
+        fondo3.pack_propagate(False)
+        # pack without fill so the white panel stays centered horizontally
+        # and sits under the title
+        fondo3.pack(padx=20, pady=10)
 
-        lbl_nombre=Label(fondo3, text="Nombre del producto", font=("Inter", 24), bg="white")
+        # Canvas + scrollbar inside the white frame — only this area scrolls
+        canvas = Canvas(fondo3, bg="white", highlightthickness=0)
+        v_scroll = ttk.Scrollbar(fondo3, orient='vertical', command=canvas.yview)
+        canvas.configure(yscrollcommand=v_scroll.set)
+        v_scroll.pack(side=RIGHT, fill=Y)
+        canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+        # Inner frame that will hold the actual form/widgets
+        inner = Frame(canvas, bg='white')
+        # Create a window inside the canvas to host the inner frame and keep
+        # a reference so we can resize it to match the canvas width.
+        inner_window = canvas.create_window((0, 0), window=inner, anchor='nw')
+
+        # Update scrollregion when inner frame resizes
+        def _on_inner_configure(event=None):
+            canvas.configure(scrollregion=canvas.bbox('all'))
+            try:
+                # make the inner window match the visible canvas width so
+                # widgets expand correctly and there is no horizontal scroll
+                canvas.itemconfig(inner_window, width=canvas.winfo_width())
+            except Exception:
+                pass
+
+        inner.bind('<Configure>', _on_inner_configure)
+
+        # Only scroll the canvas when mouse is over it
+        def _bind_to_mousewheel(event):
+            canvas.bind_all('<MouseWheel>', _on_mousewheel)
+
+        def _unbind_from_mousewheel(event):
+            canvas.unbind_all('<MouseWheel>')
+
+        def _on_mousewheel(event):
+            # Windows scroll direction uses event.delta in multiples of 120
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), 'units')
+
+        canvas.bind('<Enter>', _bind_to_mousewheel)
+        canvas.bind('<Leave>', _unbind_from_mousewheel)
+
+        # Keep the inner frame width in sync when the canvas is resized
+        def _on_canvas_configure(event):
+            try:
+                canvas.itemconfig(inner_window, width=event.width)
+            except Exception:
+                pass
+
+        canvas.bind('<Configure>', _on_canvas_configure)
+
+        # adjust fondo3 height so it reaches close to the bottom of fondo2
+        def _adjust_fondo3_height():
+            try:
+                total = fondo2.winfo_height()
+                title_h = lbl_titulo.winfo_height()
+                # leave some padding at bottom and top
+                new_h = max(300, total - title_h - 80)
+                fondo3.configure(height=new_h)
+                # ensure the canvas item is updated after the change
+                canvas.update_idletasks()
+                _on_inner_configure()
+            except Exception:
+                pass
+
+        # schedule an initial adjustment after widgets are drawn
+        fondo2.after(100, _adjust_fondo3_height)
+
+        # place widgets inside the scrollable inner frame
+        lbl_nombre = Label(inner, text="Nombre del producto", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
-        
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+
+        nombre_entry = Entry(inner, font=("Inter", 24), bg="white")
         nombre_entry.pack(padx=20, pady=10)
 
-        lbl_precio=Label(fondo3, text="Precio unitario", font=("Inter", 24), bg="white")
+        lbl_precio = Label(inner, text="Precio unitario", font=("Inter", 24), bg="white")
         lbl_precio.pack(padx=20, pady=10)
 
-        precio_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        precio_entry = Entry(inner, font=("Inter", 24), bg="white")
         precio_entry.pack(padx=20, pady=10)
-
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_producto(nuevo_producto))
-        btn_regresar.pack(padx=20, pady=10)
         
+        lbl_categoria = Label(inner, text="Categoría", font=("Inter", 24), bg="white")
+        lbl_categoria.pack(padx=20, pady=10)
+        # use a Combobox (dropdown) for category selection so user can only
+        # select one value easily
+        categories = ["Alimentos", "Bebida", "Especiales"]
+        combobox_categoria = ttk.Combobox(inner, values=categories, font=("Inter", 20), state='readonly')
+        combobox_categoria.set(categories[0])
+        combobox_categoria.pack(padx=20, pady=10)
+
         def on_agregar():
             nombre = nombre_entry.get().strip()
             precio_text = precio_entry.get().strip()
@@ -258,30 +349,69 @@ class interfacesProducto():
                 messagebox.showerror("Error", "Precio inválido. Introduce un número válido.")
                 return
 
-            agregado = metodos_productos.Productos_acciones.agregar(nombre, precio)
-            if agregado:
-                messagebox.showinfo("Éxito", "Producto agregado exitosamente.")
-                self.menu_producto(nuevo_producto)
-            else:
-                messagebox.showerror("Error", "No se pudo agregar el producto. Revisa la conexión o los datos.")
-        
-        marco=Frame(fondo3, bg="white")
+            # Agregar producto y obtener su id
+            selected_category = None
+            try:
+                selected_category = combobox_categoria.get()
+            except Exception:
+                selected_category = None
 
-        ingrediente1=Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white")
+            agregado_id = metodos_productos.Productos_acciones.agregar(nombre, precio, selected_category)
+            if not agregado_id:
+                messagebox.showerror("Error", "No se pudo agregar el producto. Revisa la conexión o los datos.")
+                return
+
+            # Recolectar ingredientes seleccionados (cada variable devuelve el id del ingrediente o 0)
+            selected_ings = []
+            try:
+                for v in (ing_var_1, ing_var_2, ing_var_3, ing_var_4, ing_var_5):
+                    val = v.get()
+                    if val:
+                        selected_ings.append(val)
+            except Exception:
+                selected_ings = []
+
+            # Insertar relaciones en ingredients_details si hay ingredientes seleccionados
+            if selected_ings:
+                ok = metodos_productos.Productos_acciones.agregar_ingredientes_detalle(agregado_id, selected_ings)
+                if not ok:
+                    messagebox.showwarning("Advertencia", "Producto agregado pero no se pudieron guardar las relaciones de ingredientes.")
+                else:
+                    messagebox.showinfo("Éxito", "Producto y sus ingredientes guardados correctamente.")
+            else:
+                messagebox.showinfo("Éxito", "Producto agregado exitosamente.")
+
+            self.menu_producto(nuevo_producto)
+        
+        marco = Frame(inner, bg="white")
+
+        # Variables asociadas a cada Checkbutton; onvalue = id del ingrediente en la BD
+        ing_var_1 = IntVar(value=0)
+        ing_var_2 = IntVar(value=0)
+        ing_var_3 = IntVar(value=0)
+        ing_var_4 = IntVar(value=0)
+        ing_var_5 = IntVar(value=0)
+
+        lbl_ingredientes = Label(inner, text="Ingredientes", font=("Inter", 24), bg="white")
+        lbl_ingredientes.pack(padx=20, pady=10)
+        # Asumimos ids de ingredientes: 1..5 (ajusta según tu BD real)
+        ingrediente1=Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white", variable=ing_var_1, onvalue=1, offvalue=0)
         ingrediente1.grid(row=0, column=0, padx=20, pady=5)
-        ingrediente2=Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white")
+        ingrediente2=Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white", variable=ing_var_2, onvalue=2, offvalue=0)
         ingrediente2.grid(row=0, column=1, padx=20, pady=5)
-        ingrediente3=Checkbutton(marco, text="Carnde asada", font=("Inter", 18), bg="white")
+        ingrediente3=Checkbutton(marco, text="Carne asada", font=("Inter", 18), bg="white", variable=ing_var_3, onvalue=3, offvalue=0)
         ingrediente3.grid(row=0, column=2, padx=20, pady=5)
-        ingrediente4=Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white")
+        ingrediente4=Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white", variable=ing_var_4, onvalue=4, offvalue=0)
         ingrediente4.grid(row=1, column=0, padx=20, pady=5)
-        ingrediente5=Checkbutton(marco, text="Quesp", font=("Inter", 18), bg="white")
+        ingrediente5=Checkbutton(marco, text="Queso", font=("Inter", 18), bg="white", variable=ing_var_5, onvalue=5, offvalue=0)
         ingrediente5.grid(row=1, column=1, padx=20, pady=5)
         marco.pack(padx=20, pady=10)
 
 
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045", command=on_agregar)
+        btn_agregar = Button(inner, text="Agregar", font=("Inter", 24), bg="#F1C045", command=on_agregar)
         btn_agregar.pack(padx=20, pady=10)
+        btn_regresar = Button(inner, text="Regresar", font=("Inter", 14), bg="#F1C045", command=lambda: self.menu_producto(nuevo_producto))
+        btn_regresar.pack(padx=10, pady=50)
 
     def modificarProducto(self, modificar_producto, producto=None):
  
@@ -301,8 +431,7 @@ class interfacesProducto():
         lbl_titulo=Label(fondo2, text="Modificar producto",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
         lbl_titulo.pack(padx=20, pady=20)
 
-        fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True)
+        # (we will create a properly centered, scrollable white area below)
 
         pid = None
         initial_name = ""
@@ -311,23 +440,101 @@ class interfacesProducto():
             try:
                 pid = producto[0]
                 initial_name = producto[1]
-                initial_price = str(producto[2])
+                # category is index 2, price is index 3
+                initial_price = str(producto[3])
             except Exception:
                 pid = None
 
-        lbl_nombre=Label(fondo3, text="Nuevo nombre del producto", font=("Inter", 24), bg="white")
+        # create the name/price inputs inside a centered, scrollable white panel
+        desired_width = 1200
+        # ensure the container exists and is centered (don't propagate size)
+        fondo3 = Frame(fondo2, bg='white', width=desired_width, height=700)
+        fondo3.pack_propagate(False)
+        fondo3.pack(padx=20, pady=10)
+
+        # canvas + scrollbar to make the inner area scrollable
+        canvas_mod = Canvas(fondo3, bg='white', highlightthickness=0)
+        v_scroll_mod = ttk.Scrollbar(fondo3, orient='vertical', command=canvas_mod.yview)
+        canvas_mod.configure(yscrollcommand=v_scroll_mod.set)
+        v_scroll_mod.pack(side=RIGHT, fill=Y)
+        canvas_mod.pack(side=LEFT, fill=BOTH, expand=True)
+
+        inner_mod = Frame(canvas_mod, bg='white')
+        inner_mod_window = canvas_mod.create_window((0, 0), window=inner_mod, anchor='nw')
+
+        def _on_inner_mod_configure(event=None):
+            canvas_mod.configure(scrollregion=canvas_mod.bbox('all'))
+            try:
+                canvas_mod.itemconfig(inner_mod_window, width=canvas_mod.winfo_width())
+            except Exception:
+                pass
+
+        inner_mod.bind('<Configure>', _on_inner_mod_configure)
+
+        def _bind_to_mousewheel_mod(event):
+            canvas_mod.bind_all('<MouseWheel>', _on_mousewheel_mod)
+
+        def _unbind_from_mousewheel_mod(event):
+            canvas_mod.unbind_all('<MouseWheel>')
+
+        def _on_mousewheel_mod(event):
+            canvas_mod.yview_scroll(int(-1 * (event.delta / 120)), 'units')
+
+        canvas_mod.bind('<Enter>', _bind_to_mousewheel_mod)
+        canvas_mod.bind('<Leave>', _unbind_from_mousewheel_mod)
+
+        def _on_canvas_mod_configure(event):
+            try:
+                canvas_mod.itemconfig(inner_mod_window, width=event.width)
+            except Exception:
+                pass
+
+        canvas_mod.bind('<Configure>', _on_canvas_mod_configure)
+
+        def _adjust_fondo3_mod_height():
+            try:
+                total = fondo2.winfo_height()
+                title_h = lbl_titulo.winfo_height()
+                new_h = max(300, total - title_h - 80)
+                fondo3.configure(height=new_h)
+                canvas_mod.update_idletasks()
+                _on_inner_mod_configure()
+            except Exception:
+                pass
+
+        fondo2.after(100, _adjust_fondo3_mod_height)
+
+        # widgets inside the scrollable inner area
+        # Category combobox: read initial value from producto if present
+        initial_category = ""
+        try:
+            # DB order: id_product, product_name, products_category, unit_price
+            if producto and len(producto) > 2:
+                initial_category = producto[2] or ""
+        except Exception:
+            initial_category = ""
+
+        lbl_nombre = Label(inner_mod, text="Nuevo nombre del producto", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
-        
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+
+        nombre_entry = Entry(inner_mod, font=("Inter", 24), bg="white")
         nombre_entry.insert(0, initial_name)
         nombre_entry.pack(padx=20, pady=10)
 
-        lbl_precio=Label(fondo3, text="Nuevo precio unitario", font=("Inter", 24), bg="white")
+        lbl_precio = Label(inner_mod, text="Nuevo precio unitario", font=("Inter", 24), bg="white")
         lbl_precio.pack(padx=20, pady=10)
 
-        precio_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        precio_entry = Entry(inner_mod, font=("Inter", 24), bg="white")
         precio_entry.insert(0, initial_price)
         precio_entry.pack(padx=20, pady=10)
+
+        # Add category combobox to the modify form as well
+        lbl_categoria_mod = Label(inner_mod, text="Categoría", font=("Inter", 24), bg="white")
+        lbl_categoria_mod.pack(padx=20, pady=10)
+        categories = ["Alimentos", "Bebida", "Especiales"]
+        combobox_categoria_mod = ttk.Combobox(inner_mod, values=categories, font=("Inter", 20), state='readonly')
+        combobox_categoria_mod.set(initial_category if initial_category in categories else categories[0])
+        combobox_categoria_mod.pack(padx=20, pady=10)
 
         def on_modificar():
             nonlocal pid
@@ -354,17 +561,23 @@ class interfacesProducto():
                 messagebox.showerror("Error", "Contraseña incorrecta.")
                 return
 
-            modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid)
+            selected_category_mod = None
+            try:
+                selected_category_mod = combobox_categoria_mod.get()
+            except Exception:
+                selected_category_mod = None
+
+            modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
             if modificado:
                 messagebox.showinfo("Éxito", "Producto modificado correctamente.")
                 self.menu_producto(modificar_producto)
             else:
                 messagebox.showerror("Error", "No se pudo modificar el producto. Verifique la conexión o los datos.")
 
-        btn_agregar=Button(fondo3, text="Modificar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
+        btn_agregar = Button(inner_mod, text="Modificar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
         btn_agregar.pack(padx=20, pady=10)
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_producto(modificar_producto))
+        btn_regresar = Button(inner_mod, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_producto(modificar_producto))
         btn_regresar.pack(padx=20, pady=10)
 
     def regresar(self,menu_usuarios):
