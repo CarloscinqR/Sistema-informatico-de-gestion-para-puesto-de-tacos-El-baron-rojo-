@@ -5,16 +5,20 @@ from tkinter import messagebox
 
 class Productos_acciones():
     @staticmethod
-    def agregar(prduct_name,unit_price,id_product=None):
+    def agregar(prduct_name,unit_price,products_category=None,id_product=None):
         try:
+            # Insert product including optional category. We keep id_product
+            # as the first column so backward-compatible calls continue to work
+            # if id_product is passed explicitly (or None).
             conexionBD.cursor.execute(
-                "insert into products (id_product,product_name,unit_price) values (%s,%s, %s)",
-                (id_product,prduct_name, unit_price,)
+                "INSERT INTO products (id_product, product_name, products_category, unit_price) VALUES (%s, %s, %s, %s)",
+                (id_product, prduct_name, products_category, unit_price)
             )
             conexionBD.conexion.commit()
-            return True
-
-        
+            try:
+                return conexionBD.cursor.lastrowid
+            except Exception:
+                return False
         except:
             return False
         
@@ -26,7 +30,8 @@ class Productos_acciones():
 
             texto_productos = ""
             for producto in productos:
-                texto_productos += f"ID: {producto[0]}, Nombre: {producto[1]}, Precio Unitario: {producto[2]}\n"
+                # DB order: id_product, product_name, products_category, unit_price
+                texto_productos += f"ID: {producto[0]}, Nombre: {producto[1]}, Precio Unitario: {producto[3]}\n"
             etiqueta_productos = Label(productos.contenedor_botones, text=texto_productos, font=("Inter", 16), bg="white", justify=LEFT)
             etiqueta_productos.pack(padx=20, pady=10)
         except Exception as e:
@@ -43,12 +48,20 @@ class Productos_acciones():
             return []
 
     @staticmethod
-    def modificar_producto(nuevo_nombre, nuevo_precio,id_product=None):
+    def modificar_producto(nuevo_nombre, nuevo_precio, id_product=None, products_category=None):
         try:
-            conexionBD.cursor.execute(
-                "UPDATE products SET product_name=%s, unit_price=%s WHERE id_product=%s",
-                (nuevo_nombre, nuevo_precio, id_product)
-            )
+            # Update product information; category is optional
+            if products_category is None:
+                conexionBD.cursor.execute(
+                    "UPDATE products SET product_name=%s, unit_price=%s WHERE id_product=%s",
+                    (nuevo_nombre, nuevo_precio, id_product)
+                )
+            else:
+                # update name, category and price; column name is products_category
+                conexionBD.cursor.execute(
+                    "UPDATE products SET product_name=%s, products_category=%s, unit_price=%s WHERE id_product=%s",
+                    (nuevo_nombre, products_category, nuevo_precio, id_product)
+                )
             conexionBD.conexion.commit()
             return True
         except:
@@ -67,5 +80,26 @@ class Productos_acciones():
                 return conexionBD.cursor.rowcount > 0
             except Exception:
                 return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def agregar_ingredientes_detalle(id_product, ingredient_id):
+        try:
+            inserted_any = False
+            for id_ingredients in ingredient_id:
+                try:
+                    conexionBD.cursor.execute(
+                        "INSERT INTO ingredients_details (id_ingredients, id_product) VALUES (%s, %s)",
+                        (id_ingredients, id_product)
+                    )
+                    inserted_any = True
+                except Exception:
+                    # seguir intentando con los demás
+                    pass
+            if inserted_any:
+                conexionBD.conexion.commit()
+                return True
+            return False
         except Exception:
             return False
