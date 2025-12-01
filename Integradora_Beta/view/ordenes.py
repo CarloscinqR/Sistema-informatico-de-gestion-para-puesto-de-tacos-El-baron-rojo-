@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from view import menu_principal
 from model import metodos_ordenes,metodos_productos
 from controller import funciones
@@ -156,16 +157,16 @@ class interfacesOrdenes():
         btn_regresar=Button(header, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.menu_ordenes(nueva_orden))
         btn_regresar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
-        btn_alimentos=Button(header, text="Alimentos", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesAlimentos(contenedor_botones_productos))
+        btn_alimentos=Button(header, text="Alimentos", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesAlimentos(contenedor_botones_productos,self.pedido_widget))
         btn_alimentos.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
-        btn_especiales=Button(header, text="Especiales", font=("Inter", 24), fg="#A6171C", bg="#F1C045")
+        btn_especiales=Button(header, text="Especiales", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesEspeciales(contenedor_botones_productos,self.pedido_widget))
         btn_especiales.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
 
-        btn_bebidas=Button(header, text="Bebidas", font=("Inter", 24), fg="#A6171C", bg="#F1C045")
+        btn_bebidas=Button(header, text="Bebidas", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesBebidas(contenedor_botones_productos,self.pedido_widget))
         btn_bebidas.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
-        btn_confirmar=Button(header, text="Confirmar", font=("Inter", 24), fg="#A6171C", bg="#F1C045")
+        btn_confirmar=Button(header, text="Confirmar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.confirmar_pedido())
         btn_confirmar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
 
         contenedor_botones_productos=Frame(fondo, bg="#D6D0C5")
@@ -180,12 +181,32 @@ class interfacesOrdenes():
         titulo_orden.pack(pady=5)
         nombre_comprador=Label(contenedor_orden, bg="#EAEAE9", font=5, text="Nombre del Cliente:")
         nombre_comprador.pack(pady=5)
-        nombre=Entry(contenedor_orden, bg="#EAEAE9")
-        nombre.pack(fill="y", padx=5, pady=5)
+        self.nombre_entry=Entry(contenedor_orden, bg="#EAEAE9")
+        self.nombre_entry.pack(fill="y", padx=5, pady=5)
+        self.pedido_widget=Text(contenedor_orden, background="white",pady=10, font=("Inter", 14))
+        self.pedido_widget.pack(fill=BOTH, expand=True)
+        # estructura interna para llevar cantidades por id de producto
+        self._order_items = {}
 
-    def botonesAlimentos(self,contenedor_botones_productos):
-            #El metodo determina qué se muestra, falta que se ponga en cada categoría
+    def botonesAlimentos(self,contenedor_botones_productos,pedido):
+            self.borrarPantalla(contenedor_botones_productos)
             productos=metodos_productos.Productos_acciones.obtener_productos()
+            maximo=3
+            for c in range(maximo):
+                contenedor_botones_productos.grid_columnconfigure(c, weight=1)
+            filas=(len(productos)+maximo-1)//maximo
+            for r in range(filas):
+                contenedor_botones_productos.grid_rowconfigure(r, weight=1)
+            for i,producto in enumerate(productos):
+                fila=i//maximo
+                columna=i%maximo
+                # al presionar, agregar producto al pedido (maneja cantidades y formato)
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=("Inter", 22), command=lambda p=producto: self._add_to_pedido(pedido, p))
+                boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
+
+    def botonesEspeciales(self,contenedor_botones_productos,pedido):
+            self.borrarPantalla(contenedor_botones_productos)
+            productos=metodos_productos.Productos_acciones.obtener_especiales()
             maximo=3
             for c in range(maximo):
                 contenedor_botones_productos.grid_columnconfigure(c, weight=1)
@@ -196,8 +217,107 @@ class interfacesOrdenes():
             for i,producto in enumerate(productos):
                 fila=i//maximo
                 columna=i%maximo
-                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=20, command= lambda:"")
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=("Inter", 22), command=lambda e=producto: self._add_to_pedido(pedido, e))
                 boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
+
+    def botonesBebidas(self,contenedor_botones_productos,pedido):
+            self.borrarPantalla(contenedor_botones_productos)
+            productos=metodos_productos.Productos_acciones.obtener_bebidas()
+            maximo=3
+            for c in range(maximo):
+                contenedor_botones_productos.grid_columnconfigure(c, weight=1)
+            filas=(len(productos)+maximo-1)//maximo
+            for r in range(filas):
+                contenedor_botones_productos.grid_rowconfigure(r, weight=1)
+            
+            for i,producto in enumerate(productos):
+                fila=i//maximo
+                columna=i%maximo
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=("Inter", 22), command=lambda b=producto: self._add_to_pedido(pedido, b))
+                boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
+
+    def _add_to_pedido(self, pedido, producto):
+            """Agregar producto al Text `pedido` usando un diccionario interno.
+            Mantiene cantidades por `id_product` y re-renderiza el `Text` sin perder otras entradas.
+            """
+            try:
+                prod_id = producto[0]
+                nombre = str(producto[1])
+                precio_unit = float(producto[3])
+            except Exception:
+                # fallback si la tupla tiene estructura desconocida
+                prod_id = str(producto)
+                nombre = str(producto)
+                precio_unit = 0.0
+
+            # usar id como clave si está disponible
+            key = prod_id
+            entry = self._order_items.get(key)
+            if entry is None:
+                # nueva entrada
+                self._order_items[key] = {"name": nombre, "qty": 1, "unit": precio_unit}
+            else:
+                # incrementar cantidad
+                entry["qty"] += 1
+
+            # re-renderizar el pedido desde el dict (preserva todo lo agregado)
+            self._render_pedido(pedido)
+
+    def _render_pedido(self, pedido):
+            """Escribe en el widget Text `pedido` todas las líneas desde `self._order_items`.
+            Formato: 'Nx Nombre -- $TT.TT'
+            """
+            lines = []
+            for key, v in self._order_items.items():
+                try:
+                    total = v["qty"] * float(v["unit"])
+                except Exception:
+                    total = 0.0
+                lines.append(f"{v['qty']}x {v['name']} -- ${total:.2f}")
+
+            pedido.delete("1.0", END)
+            if lines:
+                pedido.insert(END, "\n".join(lines) + "\n")
+
+    def confirmar_pedido(self):
+            """Calcula total, valida cliente, inserta orden y sus detalles en la BD."""
+            if not self._order_items:
+                messagebox.showwarning("Atención", "No hay productos en el pedido.")
+                return
+
+            # calcular total
+            total = 0.0
+            for v in self._order_items.values():
+                try:
+                    total += v["qty"] * float(v["unit"])
+                except Exception:
+                    pass
+
+            cliente = self.nombre_entry.get().strip()
+            if not cliente:
+                messagebox.showwarning("Atención", "Ingrese el nombre del cliente.")
+                return
+
+            # insertar orden
+            order_id = metodos_ordenes.Ordenes_acciones.agregar(total, cliente)
+            if not order_id:
+                messagebox.showerror("Error", "No se pudo crear la orden en la base de datos.")
+                return
+
+            # insertar detalles
+            ok = metodos_ordenes.Ordenes_acciones.agregar_detalles(order_id, self._order_items)
+            if not ok:
+                messagebox.showwarning("Advertencia", f"Orden creada (id {order_id}) pero no se pudieron guardar todos los detalles.")
+            else:
+                messagebox.showinfo("Éxito", f"Orden creada correctamente. ID: {order_id}")
+
+            # limpiar vista
+            self._order_items = {}
+            try:
+                self.pedido_widget.delete("1.0", END)
+                self.nombre_entry.delete(0, END)
+            except Exception:
+                pass
     
     def verOrdenes(self,ver_ordenes):
         self.borrarPantalla(ver_ordenes)
