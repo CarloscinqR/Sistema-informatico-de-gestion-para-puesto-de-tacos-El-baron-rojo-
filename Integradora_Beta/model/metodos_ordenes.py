@@ -5,15 +5,19 @@ from tkinter import messagebox
 
 class Ordenes_acciones():
     @staticmethod
-    def agregar(total,cliente):
+    def agregar(total, cliente):
+        """Inserta una orden en la tabla `orders` y devuelve el `id_order` insertado o False en error."""
         try:
             conexionBD.cursor.execute(
-                "insert into user (id_order,date,total,costumer_name) values (null,NOW(),%s, %s,)",
-                (total,cliente)
+                "INSERT INTO orders (date, total, costumer_name) VALUES (NOW(), %s, %s)",
+                (total, cliente)
             )
             conexionBD.conexion.commit()
-            return True
-        except:
+            try:
+                return conexionBD.cursor.lastrowid
+            except Exception:
+                return False
+        except Exception as e:
             return False
         
 
@@ -26,6 +30,38 @@ class Ordenes_acciones():
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener ordenes: {e}")
             return []
+        
+    @staticmethod
+    def agregar_orden():
+        pass
+
+    @staticmethod
+    def agregar_detalles(id_order, items):
+        """Inserta los detalles de la orden en `detail_order`.
+        `items` debe ser un dict con clave=id_product y valor dict {"qty": int}.
+        Devuelve True si al menos uno se insertó, False si hubo error.
+        """
+        try:
+            inserted = False
+            for pid, v in items.items():
+                try:
+                    qty = int(v.get("qty", 0))
+                    # insertar cada detalle (amount, id_product, id_order)
+                    conexionBD.cursor.execute(
+                        "INSERT INTO detail_order (amount, id_product, id_order) VALUES (%s, %s, %s)",
+                        (qty, pid, id_order)
+                    )
+                    inserted = True
+                except Exception:
+                    # ignorar detalle fallido y continuar
+                    pass
+
+            if inserted:
+                conexionBD.conexion.commit()
+                return True
+            return False
+        except Exception:
+            return False
 
     # @staticmethod
     # def modificar_usuario(id_product, nuevo_nombre, nuevo_precio):
