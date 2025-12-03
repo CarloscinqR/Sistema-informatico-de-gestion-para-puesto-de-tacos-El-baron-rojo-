@@ -4,33 +4,48 @@ from tkinter import messagebox
 
 class Ingredientes_acciones:
     @staticmethod
-    def agregar(name, quantity, measurement_unit, id_product):
+    def agregar(name, measurement_unit, id_product, quantity):
         try:
-            # Validate product id exists (to avoid FK error)
-            if id_product is None:
-                messagebox.showerror("Error", "ID de producto requerido.")
+            # name, measurement_unit, id_product and quantity are required
+            if not name or not measurement_unit:
+                messagebox.showerror("Error", "Nombre y unidad de medida son requeridos.")
                 return False
+            
+            if id_product is None:
+                messagebox.showerror("Error", "Producto es requerido.")
+                return False
+            
             try:
                 idp = int(id_product)
             except Exception:
                 messagebox.showerror("Error", "ID de producto inválido.")
                 return False
+            
             conexionBD.cursor.execute("SELECT id_product FROM products WHERE id_product=%s", (idp,))
             if not conexionBD.cursor.fetchone():
                 messagebox.showerror("Error", "Producto no existe.")
                 return False
-
-            # Begin insert into ingredients then details, commit once
+            
+            # quantity is required; validate it
+            try:
+                qty = int(quantity) if quantity else 0
+            except Exception:
+                messagebox.showerror("Error", "Cantidad inválida.")
+                return False
+            
+            # Insert into ingredients table (only has: id_ingredients, name, measurement_unit)
             conexionBD.cursor.execute(
-                "INSERT INTO ingredients (name, quantity, measurement_unit, id_product) VALUES (%s, %s, %s, %s)",
-                (name, quantity, measurement_unit, idp)
+                "INSERT INTO ingredients (name, measurement_unit) VALUES (%s, %s)",
+                (name, measurement_unit)
             )
             ing_id = conexionBD.cursor.lastrowid
-            # correlate in ingredients_details
+            
+            # Create the relationship in ingredients_details with quantity
             conexionBD.cursor.execute(
-                "INSERT INTO ingredients_details (id_ingredients, id_product) VALUES (%s, %s)",
-                (ing_id, idp)
+                "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
+                (ing_id, idp, qty)
             )
+            
             conexionBD.conexion.commit()
             return ing_id
         except Exception as e:
@@ -53,9 +68,7 @@ class Ingredientes_acciones:
                 texto_ingrediente += (
                     f"ID: {ingrediente[0]}, "
                     f"Nombre: {ingrediente[1]}, "
-                    f"Cantidad: {ingrediente[2]}, "
-                    f"Unidad: {ingrediente[3]}, "
-                    f"ID_Product: {ingrediente[4]}\n"
+                    f"Unidad: {ingrediente[2]}\n"
                 )
 
             etiqueta_ingredientes = Label(
@@ -72,71 +85,84 @@ class Ingredientes_acciones:
     @staticmethod
     def obtener_ingredientes():
         try:
-            conexionBD.cursor.execute("SELECT * FROM ingredients")
+            # Get ingredients with their quantity from ingredients_details
+            conexionBD.cursor.execute("""
+                SELECT i.id_ingredients, i.name, i.measurement_unit, COALESCE(d.quntity, 0) as quantity
+                FROM ingredients i
+                LEFT JOIN ingredients_details d ON i.id_ingredients = d.id_ingredients
+            """)
             ingredientes = conexionBD.cursor.fetchall()
             return ingredientes
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener ingredientes: {e}")
             return []
 
+    
     @staticmethod
-    def modificar(name, quantity, measurement_unit, id_product, id_ingredient):
+    def modificar(name, measurement_unit, id_ingredient, id_product, quantity):
         try:
             # Validate id_ingredient exists
             conexionBD.cursor.execute("SELECT id_ingredients FROM ingredients WHERE id_ingredients=%s", (id_ingredient,))
             if not conexionBD.cursor.fetchone():
-                messagebox.showerror("Error", "Ingrediente no existe en la base de datos")
-                return False
+                msg = "Ingrediente no existe en la base de datos"
+                messagebox.showerror("Error", msg)
+                return False, msg
 
+            # Validate product and quantity are provided
+            if id_product is None:
+                msg = "Producto es requerido."
+                messagebox.showerror("Error", msg)
+                return False, msg
+            
             # Validate provided product id exists in products table (FK constraint)
-            if id_product is not None:
-                try:
-                    idp = int(id_product)
-                except Exception:
-                    messagebox.showerror("Error", "ID de producto inválido.")
-                    return False
-                conexionBD.cursor.execute("SELECT id_product FROM products WHERE id_product=%s", (idp,))
-                if not conexionBD.cursor.fetchone():
-                    messagebox.showerror("Error", "No existe product con el ID proporcionado.")
-                    return False
-            # Ensure quantity is numeric
             try:
-                qty_int = int(float(quantity)) if quantity is not None else 0
+                idp = int(id_product)
+            except Exception:
+                msg = "ID de producto inválido."
+                messagebox.showerror("Error", msg)
+                return False, msg
+            
+            conexionBD.cursor.execute("SELECT id_product FROM products WHERE id_product=%s", (idp,))
+            if not conexionBD.cursor.fetchone():
+                msg = "No existe product con el ID proporcionado."
+                messagebox.showerror("Error", msg)
+                return False, msg
+            
+            # Ensure quantity is numeric and provided
+            try:
+                qty_int = int(quantity) if quantity else 0
             except Exception:
                 msg = "Cantidad inválida."
                 messagebox.showerror("Error", msg)
                 return False, msg
 
-            # No explicit length validation for measurement_unit (DB schema governs actual limits)
-
-            # Update ingredient
+            # Update ingredient (only has: id_ingredients, name, measurement_unit)
             conexionBD.cursor.execute(
-                "UPDATE ingredients SET name=%s, quantity=%s, measurement_unit=%s, id_product=%s WHERE id_ingredients=%s",
-                (name, qty_int, measurement_unit, idp if id_product is not None else None, id_ingredient)
+                "UPDATE ingredients SET name=%s, measurement_unit=%s WHERE id_ingredients=%s",
+                (name, measurement_unit, id_ingredient)
             )
             rows_updated = conexionBD.cursor.rowcount
 
-            # If a product id was provided, make sure ingredients_details is correlated
-            if id_product is not None:
-                # Try to update an existing detail entry; otherwise insert a new one
+            # Update or insert ingredients_details
+            conexionBD.cursor.execute(
+                "UPDATE ingredients_details SET id_product=%s, quntity=%s WHERE id_ingredients=%s",
+                (idp, qty_int, id_ingredient)
+            )
+            if conexionBD.cursor.rowcount == 0:
+                # No existing detail row: insert one
                 conexionBD.cursor.execute(
-                    "UPDATE ingredients_details SET id_product=%s WHERE id_ingredients=%s",
-                    (idp, id_ingredient)
+                    "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
+                    (id_ingredient, idp, qty_int)
                 )
-                if conexionBD.cursor.rowcount == 0:
-                    # No existing detail row: insert one
-                    conexionBD.cursor.execute(
-                        "INSERT INTO ingredients_details (id_ingredients, id_product) VALUES (%s, %s)",
-                        (id_ingredient, idp)
-                    )
 
             conexionBD.conexion.commit()
-            try:
-                return rows_updated > 0, None
-            except Exception:
-                return True, None
+            return True, None
         except Exception as e:
             # Provide detailed error to help debugging
+            try:
+                conexionBD.conexion.rollback()
+            except Exception:
+                pass
             msg = f"No se pudo modificar ingrediente: {e}"
             messagebox.showerror("Error", msg)
             print(f"ERROR modificar ingrediente: {e}")
