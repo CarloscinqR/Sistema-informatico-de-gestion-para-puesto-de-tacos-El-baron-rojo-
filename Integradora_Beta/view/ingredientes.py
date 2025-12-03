@@ -108,15 +108,15 @@ class interfacesIngrediente():
         header_frame = Frame(contenedor_tabla, bg='#A6171C')
         header_frame.pack(fill='x', padx=20, pady=(10, 0))
         header_frame.columnconfigure(0, weight=120)
-        header_frame.columnconfigure(1, weight=480)
-        header_frame.columnconfigure(2, weight=160)
-        header_frame.columnconfigure(3, weight=160)
-        header_frame.columnconfigure(4, weight=180)
+        header_frame.columnconfigure(1, weight=380)
+        header_frame.columnconfigure(2, weight=120)
+        header_frame.columnconfigure(3, weight=120)
+        header_frame.columnconfigure(4, weight=260)
 
         lbl_h_id = Label(header_frame, text='Id_ingrediente', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
         lbl_h_nombre = Label(header_frame, text='Nombre', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='w')
         lbl_h_cant = Label(header_frame, text='Cantidad', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
-        lbl_h_unidad = Label(header_frame, text='Unidad', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='e')
+        lbl_h_unidad = Label(header_frame, text='Unidad', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
         lbl_h_acciones = Label(header_frame, text='Acciones', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
 
         lbl_h_id.grid(row=0, column=0, sticky='we', padx=(4,2))
@@ -127,10 +127,10 @@ class interfacesIngrediente():
 
         tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='', selectmode='browse')
         tabla.column('Id_ingrediente', width=120, anchor=CENTER)
-        tabla.column('Nombre', width=480, anchor=W)
-        tabla.column('Cantidad', width=160, anchor=CENTER)
-        tabla.column('Unidad', width=160, anchor=E)
-        tabla.column('Acciones', width=180, anchor=CENTER)
+        tabla.column('Nombre', width=380, anchor=W)
+        tabla.column('Cantidad', width=120, anchor=CENTER)
+        tabla.column('Unidad', width=120, anchor=CENTER)
+        tabla.column('Acciones', width=260, anchor=CENTER)
 
         vsb = ttk.Scrollbar(contenedor_tabla, orient='vertical')
         def _vsb_command(*args):
@@ -221,7 +221,8 @@ class interfacesIngrediente():
             try:
                 items = metodos_ingredientes.Ingredientes_acciones.obtener_ingredientes()
                 for i, ing in enumerate(items):
-                    iid = tabla.insert('', 'end', values=(ing[0], ing[1], ing[2], ing[3], ''), tags=('even' if i % 2 == 0 else 'odd',))
+                    # ing = (id, name, measurement_unit, quantity)
+                    iid = tabla.insert('', 'end', values=(ing[0], ing[1], ing[3], ing[2], ''), tags=('even' if i % 2 == 0 else 'odd',))
                     btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
                     btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
                     btn_editar.config(command=lambda iid=iid, ing=ing: on_editar(iid, ing))
@@ -310,11 +311,6 @@ class interfacesIngrediente():
         ent_nombre = Entry(fondo2, font=("Inter", 14))
         ent_nombre.pack(padx=20, pady=10)
 
-        lbl_cant = Label(fondo2, text="Cantidad", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
-        lbl_cant.pack(padx=20, pady=10)
-        ent_cant = Entry(fondo2, font=("Inter", 14))
-        ent_cant.pack(padx=20, pady=10)
-
         lbl_unit = Label(fondo2, text="Unidad de medida", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
         lbl_unit.pack(padx=20, pady=10)
         ent_unit = Entry(fondo2, font=("Inter", 14))
@@ -334,30 +330,42 @@ class interfacesIngrediente():
             cb_prod.set(prod_names[0])
         cb_prod.pack(padx=20, pady=10)
 
+        lbl_qty = Label(fondo2, text="Cantidad", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
+        lbl_qty.pack(padx=20, pady=10)
+        ent_qty = Entry(fondo2, font=("Inter", 14))
+        ent_qty.pack(padx=20, pady=10)
+
         def on_save():
             name = ent_nombre.get().strip()
-            qty = ent_cant.get().strip()
             unit = ent_unit.get().strip()
             prod_name = cb_prod.get().strip()
-            if not prod_name:
-                messagebox.showerror("Error", "Debe seleccionar un producto.")
+            qty = ent_qty.get().strip()
+            
+            if not name:
+                messagebox.showerror("Error", "El nombre es requerido.")
                 return
+            if not unit:
+                messagebox.showerror("Error", "La unidad de medida es requerida.")
+                return
+            if not prod_name:
+                messagebox.showerror("Error", "El producto es requerido.")
+                return
+            if not qty:
+                messagebox.showerror("Error", "La cantidad es requerida.")
+                return
+            
             id_prod = prod_id_by_name.get(prod_name)
             if id_prod is None:
                 messagebox.showerror("Error", "Producto seleccionado inválido.")
                 return
-            if not name:
-                messagebox.showerror("Error", "El nombre es requerido.")
-                return
+            
             try:
-                if qty:
-                    # allow decimal but cast to float for validations
-                    x = float(qty)
+                float(qty)
             except Exception:
                 messagebox.showerror("Error", "Cantidad inválida.")
                 return
 
-            new_id = metodos_ingredientes.Ingredientes_acciones.agregar(name, qty or 0, unit or '', id_prod)
+            new_id = metodos_ingredientes.Ingredientes_acciones.agregar(name, unit, id_prod, qty)
             if not new_id:
                 messagebox.showerror("Error", "No se pudo agregar ingrediente.")
                 return
@@ -393,8 +401,8 @@ class interfacesIngrediente():
                 messagebox.showerror("Error", "Ingrediente no encontrado.")
                 self.menu_ingrediente(modificar_ingrediente)
                 return
-            # id, name, qty, unit, id_product
-            _, name, qty, unit, id_prod = sel
+            # id, name, measurement_unit, quantity
+            _, name, unit, qty = sel
         except Exception:
             messagebox.showerror("Error", "No se pudo cargar ingrediente.")
             self.menu_ingrediente(modificar_ingrediente)
@@ -405,12 +413,6 @@ class interfacesIngrediente():
         ent_nombre = Entry(fondo2, font=("Inter", 14))
         ent_nombre.insert(0, name)
         ent_nombre.pack(padx=20, pady=10)
-
-        lbl_cant = Label(fondo2, text="Cantidad", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
-        lbl_cant.pack(padx=20, pady=10)
-        ent_cant = Entry(fondo2, font=("Inter", 14))
-        ent_cant.insert(0, qty)
-        ent_cant.pack(padx=20, pady=10)
 
         lbl_unit = Label(fondo2, text="Unidad de medida", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
         lbl_unit.pack(padx=20, pady=10)
@@ -426,39 +428,53 @@ class interfacesIngrediente():
         prod_names = list(prod_id_by_name.keys()) if prod_id_by_name else []
         cb_prod = ttk.Combobox(fondo2, values=prod_names, state='readonly')
         if prod_names:
-            cb_prod.set(prod_name_by_id.get(id_prod, prod_names[0]))
+            cb_prod.set(prod_names[0])
         cb_prod.pack(padx=20, pady=10)
+
+        lbl_qty = Label(fondo2, text="Cantidad", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
+        lbl_qty.pack(padx=20, pady=10)
+        ent_qty = Entry(fondo2, font=("Inter", 14))
+        ent_qty.insert(0, str(qty))
+        ent_qty.pack(padx=20, pady=10)
 
         def on_update():
             new_name = ent_nombre.get().strip()
-            new_qty = ent_cant.get().strip()
             new_unit = ent_unit.get().strip()
             new_prod_name = cb_prod.get().strip()
-            if not new_prod_name:
-                messagebox.showerror("Error", "Debe seleccionar un producto.")
+            new_qty = ent_qty.get().strip()
+            
+            if not new_name:
+                messagebox.showerror("Error", "El nombre es requerido.")
                 return
+            if not new_unit:
+                messagebox.showerror("Error", "La unidad de medida es requerida.")
+                return
+            if not new_prod_name:
+                messagebox.showerror("Error", "El producto es requerido.")
+                return
+            if not new_qty:
+                messagebox.showerror("Error", "La cantidad es requerida.")
+                return
+            
             new_prod = prod_id_by_name.get(new_prod_name)
             if new_prod is None:
                 messagebox.showerror("Error", "Producto seleccionado inválido.")
                 return
-            if not new_name:
-                messagebox.showerror("Error", "El nombre es requerido.")
-                return
+            
             try:
-                if new_qty:
-                    _ = float(new_qty)
+                float(new_qty)
             except Exception:
                 messagebox.showerror("Error", "Cantidad inválida.")
                 return
+            
             pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_ingrediente)
             if pwd is None:
                 return
             if pwd != ADMIN_PASSWORD:
                 messagebox.showerror("Error", "Contraseña incorrecta.")
                 return
-            # no limit imposed on measurement unit here (DB validation applies)
 
-            res = metodos_ingredientes.Ingredientes_acciones.modificar(new_name, new_qty or 0, new_unit or '', new_prod, id_ingredient)
+            res = metodos_ingredientes.Ingredientes_acciones.modificar(new_name, new_unit, id_ingredient, new_prod, new_qty)
             if isinstance(res, tuple):
                 ok, err = res
             else:
@@ -478,5 +494,7 @@ class interfacesIngrediente():
 
     def regresar(self, menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
+
+
 
 
