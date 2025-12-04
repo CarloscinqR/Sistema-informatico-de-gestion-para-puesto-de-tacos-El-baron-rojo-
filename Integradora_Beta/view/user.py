@@ -1,23 +1,24 @@
 from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
 from view import menu_principal
-from tkinter import ttk,messagebox,simpledialog
-from model import metodos_usuarios
+from model import metodos_ordenes,metodos_productos
 from controller import funciones
-
-class interfacesUsuario():
-    def __init__(self,menu_usuarios):
-        menu_usuarios.title("Menu Usuarios")
-        menu_usuarios.geometry("1920x1080")
-        menu_usuarios.state("zoomed")
-        self.menu_usuario(menu_usuarios)
+#Falta eliminar y el modificar de este CRUD
+class interfacesOrdenes():
+    def __init__(self,ventana_ordenes):
+        ventana_ordenes.title("Menu ordenes")
+        ventana_ordenes.geometry("1920x1080")
+        ventana_ordenes.state("zoomed")
+        self.menu_ordenes(ventana_ordenes)
 
     def borrarPantalla(self,ventana_login):
         for widget in ventana_login.winfo_children():
             widget.destroy()
 
-    def menu_usuario(self,menu_usuarios):
-        self.borrarPantalla(menu_usuarios)
-        fondo=Frame(menu_usuarios, bg="#D6D0C5")
+    def menu_ordenes(self,ventana_ordenes):
+        self.borrarPantalla(ventana_ordenes)
+        fondo=Frame(ventana_ordenes, bg="#D6D0C5")
         fondo.pack_propagate(False)
         fondo.pack(fill="both", expand=True)
 
@@ -25,7 +26,7 @@ class interfacesUsuario():
         fondo2.pack_propagate(False)
         fondo2.pack(padx=99, pady=50)
 
-        lbl_titulo=Label(fondo2, text="Usuarios",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
+        lbl_titulo=Label(fondo2, text="Ordenes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
         lbl_titulo.pack(padx=20, pady=20)
 
         contenedor_tabla=Frame(fondo2, width=2000, height=790)
@@ -46,19 +47,17 @@ class interfacesUsuario():
         style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
 
         # Agrego columna 'Acciones' para mostrar opciones sutiles por fila
-        columns = ('Id_usuario', 'Usuario','Fecha_creacion','Fecha_eliminacion', 'Rol' ,'Acciones')
+        columns = ('Id_orden', 'Fecha', 'Total', 'Cliente','Acciones')
         tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='headings', selectmode='browse')
-        tabla.heading('Id_usuario', text='Id_usuario')
-        tabla.heading('Usuario', text='Usuario')
-        tabla.heading('Fecha_creacion', text='Fecha de creacion')
-        tabla.heading('Fecha_eliminacion', text='Fecha de eliminacion')
-        tabla.heading('Rol', text='Rol')
+        tabla.heading('Id_orden', text='Id_orden')
+        tabla.heading('Fecha', text='Fecha')
+        tabla.heading('Total', text='Total')
+        tabla.heading('Cliente', text='Cliente')
         tabla.heading('Acciones', text='Acciones')
-        tabla.column('Id_usuario', width=120, anchor=CENTER)
-        tabla.column('Usuario', width=200, anchor=W)
-        tabla.column('Fecha_creacion', width=160, anchor=E)
-        tabla.column('Fecha_eliminacion', width=180, anchor=CENTER)
-        tabla.column('Rol', width=180, anchor=CENTER)
+        tabla.column('Id_orden', width=120, anchor=CENTER)
+        tabla.column('Fecha', width=160, anchor=CENTER)
+        tabla.column('Total', width=160, anchor=CENTER)
+        tabla.column('Cliente', width=160, anchor=W)
         tabla.column('Acciones', width=180, anchor=CENTER)
 
         vsb = ttk.Scrollbar(contenedor_tabla, orient="vertical")
@@ -80,64 +79,29 @@ class interfacesUsuario():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        usuarios = metodos_usuarios.Usuarios_acciones.obtener_usuarios()
+        ordenes = metodos_ordenes.Ordenes_acciones.obtener_ordenes()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
-        def on_borrar(iid, uid, uname):
-            confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el usuario?\nID: {uid}\nNombre: {uname}")
-            if not confirm:
-                return
-            eliminado = metodos_usuarios.Usuarios_acciones.borrar(uid)
-            if eliminado:
-                messagebox.showinfo("Éxito", "Usuario eliminado correctamente.")
-                try:
-                    b_ed, b_del = _row_buttons.pop(iid, (None, None))
-                    if b_ed:
-                        try:
-                            b_ed.destroy()
-                        except Exception:
-                            pass
-                    if b_del:
-                        try:
-                            b_del.destroy()
-                        except Exception:
-                            pass
-                    try:
-                        tabla.delete(iid)
-                    except Exception:
-                        pass
-                    try:
-                        reposition_buttons()
-                    except Exception:
-                        pass
-                except Exception:
-                    pass
-            else:
-                messagebox.showerror("Error", "No se pudo eliminar al usuario. Verifique la conexión o los datos.")
-        
-        def on_editar(iid, uid, uname, upassw,urol):
-            # Abrir la vista de modificación pre-llenada con los datos seleccionados
-            try:
-                self.modificarUsuario(menu_usuarios, (uid,uname,upassw,urol))
-            except Exception as e:
-                messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
-        num_users=1
-        for i, user in enumerate(usuarios):
+        for i, orden in enumerate(ordenes):
             # producto es una tupla (id_prduct, prduct_name, unit_price)
+            total = orden[2]
+            try:
+                total_text = f"{float(total):.2f} MXN"
+            except Exception:
+                total_text = str(total)
             tag = 'even' if i % 2 == 0 else 'odd'
             # Insertar fila en la tabla (sin funciones)
-            item_id = tabla.insert('', 'end', values=(num_users, user[1], user[3], user[4],user[6],''), tags=(tag,))
+            item_id = tabla.insert('', 'end', values=(orden[0], orden[1], total_text,orden[3], ''), tags=(tag,))
 
             # Crear botones visibles sobre la Treeview en la columna 'Acciones'
             # Los botones no tienen comando (no funcionales)
-            btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1], upassw=user[2],urol=user[6]: on_editar(iid, uid, uname, upassw,urol))
-            btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1]: on_borrar(iid, uid, uname))
+            btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
+            btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
             _row_buttons[item_id] = (btn_editar, btn_borrar)
-            num_users=+1
 
         # Forzar dibujo y posicionar los botones sobre cada celda 'Acciones'
-        menu_usuarios.update_idletasks()
+        ventana_ordenes.update_idletasks()
 
         def reposition_buttons():
             for iid, (b_ed, b_del) in _row_buttons.items():
@@ -171,141 +135,222 @@ class interfacesUsuario():
         except Exception:
             pass
 
-        btn_agregarProducto=Button(contenedor_tabla, text="Agregar usuario", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevoUsuario(menu_usuarios), width=22)
+        btn_agregarProducto=Button(contenedor_tabla, text="Agregar producto", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevaOrden(ventana_ordenes), width=22)
         btn_agregarProducto.pack(padx=20, pady=10, fill="x", side=LEFT)
 
-        btn_regresar=Button(contenedor_tabla, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(menu_usuarios), width=22)
+        btn_regresar=Button(contenedor_tabla, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(ventana_ordenes), width=22)
         btn_regresar.pack(padx=20, pady=10, fill="x", side=RIGHT)
+    
+    def nuevaOrden(self,nueva_orden):
+        self.borrarPantalla(nueva_orden)
+        nueva_orden.title("Nueva orden")
+        nueva_orden.geometry("1920x1080")
+        nueva_orden.state("zoomed")
 
-    def nuevoUsuario(self,nuevo_usuario):
-        self.borrarPantalla(nuevo_usuario)
-        nuevo_usuario.title("Nuevo usuario")
-        nuevo_usuario.geometry("1920x1080")
-        nuevo_usuario.state("zoomed")
-
-        fondo=Frame(nuevo_usuario, bg="#D6D0C5")
+        fondo=Frame(nueva_orden, bg="#D6D0C5")
         fondo.pack_propagate(False)
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        header=Frame(fondo, bg="#A6171C", height=180)
+        header.pack(side=TOP, fill=X)
 
-        lbl_titulo=Label(fondo2, text="Nuevo usuario",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
-
-        fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True)
-
-        lbl_nombre=Label(fondo3, text="Nombre", font=("Inter", 24), bg="white")
-        lbl_nombre.pack(padx=20, pady=10)
+        btn_regresar=Button(header, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.menu_ordenes(nueva_orden))
+        btn_regresar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
-        nomb=StringVar()
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=nomb)
-        nombre_entry.pack(padx=20, pady=10)
-
-        lbl_contrasenia=Label(fondo3, text="contraseña", font=("Inter", 24), bg="white")
-        lbl_contrasenia.pack(padx=20, pady=10)
-
-        contr=StringVar()
-        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr)
-        contrasenia_entry.pack(padx=20, pady=10)
-
-        lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
-        lbl_rol.pack(padx=20, pady=10)
-
-        rol=StringVar()
-        rol_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=rol)
-        rol_entry.pack(padx=20, pady=10)
+        btn_alimentos=Button(header, text="Alimentos", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesAlimentos(contenedor_botones_productos,self.pedido_widget))
+        btn_alimentos.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
+        btn_especiales=Button(header, text="Especiales", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesEspeciales(contenedor_botones_productos,self.pedido_widget))
+        btn_especiales.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
-        btn_regresar.pack(padx=20, pady=10)
+        btn_bebidas=Button(header, text="Bebidas", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesBebidas(contenedor_botones_productos,self.pedido_widget))
+        btn_bebidas.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
         
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),rol.get())))
-        btn_agregar.pack(padx=20, pady=10)
+        btn_confirmar=Button(header, text="Confirmar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.confirmar_pedido())
+        btn_confirmar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
 
-    def modificarUsuario(self,modificar_usuario,usuario=None):
-        self.borrarPantalla(modificar_usuario)
-        modificar_usuario.title("Modificar Usuario")
-        modificar_usuario.geometry("1920x1080")
-        modificar_usuario.state("zoomed")
+        contenedor_botones_productos=Frame(fondo, bg="#D6D0C5")
+        contenedor_botones_productos.pack(pady=10, padx=10, fill="both", expand=True, side=LEFT)
 
-        fondo=Frame(modificar_usuario, bg="#D6D0C5")
-        fondo.pack_propagate(False)
-        fondo.pack(fill="both", expand=True)
+        #Falta que funcione el registro de ordenes
+        contenedor_orden=Frame(fondo,bg="#EAEAE9",width=300)
+        contenedor_orden.pack_propagate(False)
+        contenedor_orden.pack(pady=10, padx=10, fill="y", side=RIGHT)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        titulo_orden=Label(contenedor_orden, bg="#EAEAE9", font=46, text="Orden:")
+        titulo_orden.pack(pady=5)
+        nombre_comprador=Label(contenedor_orden, bg="#EAEAE9", font=5, text="Nombre del Cliente:")
+        nombre_comprador.pack(pady=5)
+        self.nombre_entry=Entry(contenedor_orden, bg="#EAEAE9")
+        self.nombre_entry.pack(fill="y", padx=5, pady=5)
+        self.pedido_widget=Text(contenedor_orden, background="white",pady=10, font=("Inter", 14))
+        self.pedido_widget.pack(fill=BOTH, expand=True)
+        # estructura interna para llevar cantidades por id de producto
+        self._order_items = {}
 
-        lbl_titulo=Label(fondo2, text="Modificar Usuario",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+    def botonesAlimentos(self,contenedor_botones_productos,pedido):
+            self.borrarPantalla(contenedor_botones_productos)
+            productos=metodos_productos.Productos_acciones.obtener_productos()
+            maximo=3
+            for c in range(maximo):
+                contenedor_botones_productos.grid_columnconfigure(c, weight=1)
+            filas=(len(productos)+maximo-1)//maximo
+            for r in range(filas):
+                contenedor_botones_productos.grid_rowconfigure(r, weight=1)
+            for i,producto in enumerate(productos):
+                fila=i//maximo
+                columna=i%maximo
+                # al presionar, agregar producto al pedido (maneja cantidades y formato)
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=("Inter", 22), command=lambda p=producto: self._add_to_pedido(pedido, p))
+                boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
 
-        fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True)
+    def botonesEspeciales(self,contenedor_botones_productos,pedido):
+            self.borrarPantalla(contenedor_botones_productos)
+            productos=metodos_productos.Productos_acciones.obtener_especiales()
+            maximo=3
+            for c in range(maximo):
+                contenedor_botones_productos.grid_columnconfigure(c, weight=1)
+            filas=(len(productos)+maximo-1)//maximo
+            for r in range(filas):
+                contenedor_botones_productos.grid_rowconfigure(r, weight=1)
+            
+            for i,producto in enumerate(productos):
+                fila=i//maximo
+                columna=i%maximo
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=("Inter", 22), command=lambda e=producto: self._add_to_pedido(pedido, e))
+                boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
 
-        uid = None
-        initial_name = ""
-        initial_passw=""
-        initial_rol = ""
-        if usuario:
+    def botonesBebidas(self,contenedor_botones_productos,pedido):
+            self.borrarPantalla(contenedor_botones_productos)
+            productos=metodos_productos.Productos_acciones.obtener_bebidas()
+            maximo=3
+            for c in range(maximo):
+                contenedor_botones_productos.grid_columnconfigure(c, weight=1)
+            filas=(len(productos)+maximo-1)//maximo
+            for r in range(filas):
+                contenedor_botones_productos.grid_rowconfigure(r, weight=1)
+            
+            for i,producto in enumerate(productos):
+                fila=i//maximo
+                columna=i%maximo
+                boton=Button(contenedor_botones_productos, text=f"{producto[1]}", relief="solid", font=("Inter", 22), command=lambda b=producto: self._add_to_pedido(pedido, b))
+                boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
+
+    def _add_to_pedido(self, pedido, producto):
+            """Agregar producto al Text `pedido` usando un diccionario interno.
+            Mantiene cantidades por `id_product` y re-renderiza el `Text` sin perder otras entradas.
+            """
             try:
-                uid = usuario[0]
-                initial_name = usuario[1]
-                initial_passw=usuario[2]
-                initial_rol = usuario[3]
+                prod_id = producto[0]
+                nombre = str(producto[1])
+                precio_unit = float(producto[3])
             except Exception:
-                uid = None
+                # fallback si la tupla tiene estructura desconocida
+                prod_id = str(producto)
+                nombre = str(producto)
+                precio_unit = 0.0
 
-        lbl_nombre=Label(fondo3, text="Nuevo nombre del usuario", font=("Inter", 24), bg="white")
-        lbl_nombre.pack(padx=20, pady=10)
-        
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
-        nombre_entry.insert(0, initial_name)
-        nombre_entry.pack(padx=20, pady=10)
-
-        lbl_passw=Label(fondo3, text="Nueva contraseña", font=("Inter", 24), bg="white")
-        lbl_passw.pack(padx=20, pady=10)
-
-        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white")
-        passw_entry.insert(0, initial_passw)
-        passw_entry.pack(padx=20, pady=10)
-
-        lbl_rol=Label(fondo3, text="Nuevo rol", font=("Inter", 24), bg="white")
-        lbl_rol.pack(padx=20, pady=10)
-
-        rol_entry=Entry(fondo3, font=("Inter", 24), bg="white")
-        rol_entry.insert(0, initial_rol)
-        rol_entry.pack(padx=20, pady=10)
-
-        def on_modificar():
-            nonlocal uid
-            nuevo_nombre = nombre_entry.get().strip()
-            passw_text = passw_entry.get().strip()
-            rol_text=rol_entry.get().strip()
-            if not nuevo_nombre:
-                messagebox.showerror("Error", "El nombre no puede estar vacío.")
-                return
-            if uid is None:
-                messagebox.showerror("Error", "Id del usuario desconocido. No se puede modificar.")
-                return
-            # Pedir contraseña antes de modificar
-
-            modificado = metodos_usuarios.Usuarios_acciones.modificar_usuario(nuevo_nombre, passw_text,rol_text,uid)
-            if modificado:
-                messagebox.showinfo("Éxito", "Usuario modificado correctamente.")
-                self.menu_usuario(modificar_usuario)
+            # usar id como clave si está disponible
+            key = prod_id
+            entry = self._order_items.get(key)
+            if entry is None:
+                # nueva entrada
+                self._order_items[key] = {"name": nombre, "qty": 1, "unit": precio_unit}
             else:
-                messagebox.showerror("Error", "No se pudo modificar al usuario. Verifique la conexión o los datos.")
+                # incrementar cantidad
+                entry["qty"] += 1
 
-        btn_agregar=Button(fondo3, text="Modificar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
-        btn_agregar.pack(padx=20, pady=10)
+            # re-renderizar el pedido desde el dict (preserva todo lo agregado)
+            self._render_pedido(pedido)
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(modificar_usuario))
+    def _render_pedido(self, pedido):
+            """Escribe en el widget Text `pedido` todas las líneas desde `self._order_items`.
+            Formato: 'Nx Nombre -- $TT.TT'
+            """
+            lines = []
+            for key, v in self._order_items.items():
+                try:
+                    total = v["qty"] * float(v["unit"])
+                except Exception:
+                    total = 0.0
+                lines.append(f"{v['qty']}x {v['name']} -- ${total:.2f}")
+
+            pedido.delete("1.0", END)
+            if lines:
+                pedido.insert(END, "\n".join(lines) + "\n")
+
+    def confirmar_pedido(self):
+            """Calcula total, valida cliente, inserta orden y sus detalles en la BD."""
+            if not self._order_items:
+                messagebox.showwarning("Atención", "No hay productos en el pedido.")
+                return
+
+            # calcular total
+            total = 0.0
+            for v in self._order_items.values():
+                try:
+                    total += v["qty"] * float(v["unit"])
+                except Exception:
+                    pass
+
+            cliente = self.nombre_entry.get().strip()
+            if not cliente:
+                messagebox.showwarning("Atención", "Ingrese el nombre del cliente.")
+                return
+
+            # insertar orden
+            order_id = metodos_ordenes.Ordenes_acciones.agregar(total, cliente)
+            if not order_id:
+                messagebox.showerror("Error", "No se pudo crear la orden en la base de datos.")
+                return
+
+            # insertar detalles
+            ok = metodos_ordenes.Ordenes_acciones.agregar_detalles(order_id, self._order_items)
+            if not ok:
+                messagebox.showwarning("Advertencia", f"Orden creada (id {order_id}) pero no se pudieron guardar todos los detalles.")
+            else:
+                messagebox.showinfo("Éxito", f"Orden creada correctamente. ID: {order_id}")
+
+            # limpiar vista
+            self._order_items = {}
+            try:
+                self.pedido_widget.delete("1.0", END)
+                self.nombre_entry.delete(0, END)
+            except Exception:
+                pass
+    
+    def verOrdenes(self,ver_ordenes):
+        self.borrarPantalla(ver_ordenes)
+        ver_ordenes.title("Ver ordenes")
+        ver_ordenes.geometry("1920x1080")
+        ver_ordenes.state("zoomed")
+
+        fondo=Frame(ver_ordenes, bg="#D6D0C5")
+        fondo.pack_propagate(False)
+        fondo.pack(fill="both", expand=True)
+
+        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
+        fondo2.pack_propagate(False)
+        fondo2.pack(padx=99, pady=50)
+
+        contenedor_botones=Frame(fondo2, bg="#A6171C", width=550, height=790)
+        contenedor_botones.pack_propagate(False)
+        contenedor_botones.pack(padx=300, pady=20)
+
+        lbl_titulo=Label(contenedor_botones, text="Ver ordenes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
+        lbl_titulo.pack(padx=20, pady=20)
+        
+        lbl_fecha=Label(contenedor_botones, text="Fecha", font=("Inter", 24), bg="white")
+        lbl_fecha.pack(padx=20, pady=10)
+
+        fecha_entry=Entry(contenedor_botones, font=("Inter", 24), bg="white")
+        fecha_entry.pack(padx=20, pady=10)
+
+        btn_regresar=Button(contenedor_botones, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_ordenes(ver_ordenes))
         btn_regresar.pack(padx=20, pady=10)
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
 
 
+    
