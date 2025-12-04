@@ -103,7 +103,7 @@ class interfacesProducto():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        productos = metodos_productos.Productos_acciones.obtener_todos_productos()
+        productos = metodos_productos.Productos_acciones.obtener_productos()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
@@ -115,30 +115,20 @@ class interfacesProducto():
             eliminado = metodos_productos.Productos_acciones.borrar(pid)
             if eliminado:
                 messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
+
                 try:
                     b_ed, b_del = _row_buttons.pop(iid, (None, None))
                     if b_ed:
-                        try:
-                            b_ed.destroy()
-                        except Exception:
-                            pass
+                        b_ed.destroy()
                     if b_del:
-                        try:
-                            b_del.destroy()
-                        except Exception:
-                            pass
-                    try:
-                        tabla.delete(iid)
-                    except Exception:
-                        pass
-                    try:
-                        reposition_buttons()
-                    except Exception:
-                        pass
+                        b_del.destroy()
+                    tabla.delete(iid)
+                    reposition_buttons()
                 except Exception:
                     pass
             else:
                 messagebox.showerror("Error", "No se pudo eliminar el producto. Verifique la conexión o los datos.")
+
 
         # Handler para editar un producto: abre la interfaz de modificarProducto
         def on_editar(iid, producto_tuple):
@@ -149,7 +139,7 @@ class interfacesProducto():
                 self.modificarProducto(menu_productos, producto_tuple)
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
-        num_producto=1
+
         for i, producto in enumerate(productos):
             # DB order: id_product, product_name, products_category, unit_price
             # price is at index 3
@@ -161,8 +151,7 @@ class interfacesProducto():
             tag = 'even' if i % 2 == 0 else 'odd'
             # Insertar fila en la tabla (sin funciones)
             # producto tuple order: (id_product, product_name, products_category, unit_price)
-            item_id = tabla.insert('', 'end', values=(num_producto, producto[1], producto[2], precio_text, ''), tags=(tag,))
-            num_producto+=1
+            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], producto[2], precio_text, ''), tags=(tag,))
 
             btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
             btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
@@ -530,6 +519,35 @@ class interfacesProducto():
         combobox_categoria_mod.set(initial_category if initial_category in categories else categories[0])
         combobox_categoria_mod.pack(padx=20, pady=10)
 
+        # OBTENER INGREDIENTES ACTUALES DEL PRODUCTO
+        ingredientes_actuales = []
+        try:
+            if pid is not None:
+                ingredientes_actuales = metodos_productos.Productos_acciones.obtener_ingredientes_producto(pid)
+                # print("INGREDIENTES DEL PRODUCTO:", ingredientes_actuales)
+
+        except Exception:
+            ingredientes_actuales = []
+
+        # VARIABLES DE INGREDIENTES
+        ing_var_1 = IntVar(value=1 if 1 in ingredientes_actuales else 0)
+        ing_var_2 = IntVar(value=1 if 2 in ingredientes_actuales else 0)
+        ing_var_3 = IntVar(value=1 if 3 in ingredientes_actuales else 0)
+        ing_var_4 = IntVar(value=1 if 4 in ingredientes_actuales else 0)
+        ing_var_5 = IntVar(value=1 if 5 in ingredientes_actuales else 0)
+
+        lbl_ingredientes = Label(inner_mod, text="Ingredientes", font=("Inter", 24), bg="white")
+        lbl_ingredientes.pack(padx=20, pady=10)
+
+        marco = Frame(inner_mod, bg="white")
+        marco.pack(padx=20, pady=10)
+
+        Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white", variable=ing_var_1, onvalue=1, offvalue=0).grid(row=0, column=0, padx=20, pady=5)
+        Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white", variable=ing_var_2, onvalue=2, offvalue=0).grid(row=0, column=1, padx=20, pady=5)
+        Checkbutton(marco, text="Carne asada", font=("Inter", 18), bg="white", variable=ing_var_3, onvalue=3, offvalue=0).grid(row=0, column=2, padx=20, pady=5)
+        Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white", variable=ing_var_4, onvalue=4, offvalue=0).grid(row=1, column=0, padx=20, pady=5)
+        Checkbutton(marco, text="Queso", font=("Inter", 18), bg="white", variable=ing_var_5, onvalue=5, offvalue=0).grid(row=1, column=1, padx=20, pady=5)
+
         def on_modificar():
             nonlocal pid
             nuevo_nombre = nombre_entry.get().strip()
@@ -548,6 +566,12 @@ class interfacesProducto():
                 return
 
             # Pedir contraseña antes de modificar
+            # pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_producto)
+            # if pwd is None:
+            #     return
+            # if pwd != '1234':
+            #     messagebox.showerror("Error", "Contraseña incorrecta.")
+            #     return
 
             selected_category_mod = None
             try:
@@ -556,17 +580,27 @@ class interfacesProducto():
                 selected_category_mod = None
 
             modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
+            nuevos_ingredientes = []
+            for v in (ing_var_1, ing_var_2, ing_var_3, ing_var_4, ing_var_5):
+                val = v.get()
+                if val:
+                    nuevos_ingredientes.append(val)
+
+            metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
+
             if modificado:
                 messagebox.showinfo("Éxito", "Producto modificado correctamente.")
                 self.menu_producto(modificar_producto)
             else:
                 messagebox.showerror("Error", "No se pudo modificar el producto. Verifique la conexión o los datos.")
 
-        btn_agregar = Button(inner_mod, text="Modificar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
+        btn_agregar = Button(inner_mod, text="Guardar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
         btn_agregar.pack(padx=20, pady=10)
 
-        btn_regresar = Button(inner_mod, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_producto(modificar_producto))
+        btn_regresar = Button(inner_mod, text="Regresar", font=("Inter", 14), bg="#F1C045", command=lambda: self.menu_producto(modificar_producto))
         btn_regresar.pack(padx=20, pady=10)
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
+
+        
