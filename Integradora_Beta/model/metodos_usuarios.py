@@ -69,3 +69,19 @@ class Usuarios_acciones():
                 return True
         except Exception:
             return False
+
+    @staticmethod
+    def verificar_usuario(username,password):
+        try:
+            conexionBD.cursor.execute(
+                "SELECT * FROM user WHERE username=%s AND password=%s",
+                (username,password)
+            )
+            fila_encontrada = conexionBD.cursor.fetchone()
+            if fila_encontrada is not None:
+                return True
+            else:
+                messagebox.showerror("Error",f"Usuario o Contraseña incorrectos")
+        except Exception as e:
+            messagebox.showerror("Error",f"Error al verificar: {e}")
+            return False
