@@ -215,22 +215,33 @@ class interfacesUsuario():
         lbl_contrasenia.pack(padx=20, pady=10)
 
         contr=StringVar()
-        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr)
+        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr,show="*")
         contrasenia_entry.pack(padx=20, pady=10)
+
+        lbl_passw2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
+        lbl_passw2.pack(padx=20, pady=10)
+
+        passw_entry2=Entry(fondo3, font=("Inter", 24), bg="white",show="*")
+        passw_entry2.pack(padx=20, pady=10)
+
+        def comparar_contrasenias():
+            if contrasenia_entry.get()!=passw_entry2.get():
+                messagebox.showerror(message="Las contraseñas no coinciden, intentelo de nuevo.")
 
         lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
         lbl_rol.pack(padx=20, pady=10)
-
         rol=StringVar()
-        rol_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=rol)
-        rol_entry.pack(padx=20, pady=10)
+        rol.set("Administrador")
+        menu=OptionMenu(fondo3,rol,"Administrador","Empleado")
+        menu.pack(padx=20,pady=10)
         
+        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: {funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),rol.get())),comparar_contrasenias()})
+        btn_agregar.pack(padx=20, pady=10)
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
+        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 14), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
         btn_regresar.pack(padx=20, pady=10)
         
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),rol.get())))
-        btn_agregar.pack(padx=20, pady=10)
+        
 
     def modificarUsuario(self,modificar_usuario,usuario=None):
         self.borrarPantalla(modificar_usuario)
@@ -275,9 +286,14 @@ class interfacesUsuario():
         lbl_passw=Label(fondo3, text="Nueva contraseña", font=("Inter", 24), bg="white")
         lbl_passw.pack(padx=20, pady=10)
 
-        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white")
-        passw_entry.insert(0, initial_passw)
+        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white",show="*")
         passw_entry.pack(padx=20, pady=10)
+
+        lbl_passw2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
+        lbl_passw2.pack(padx=20, pady=10)
+
+        passw_entry2=Entry(fondo3, font=("Inter", 24), bg="white",show="*")
+        passw_entry2.pack(padx=20, pady=10)
 
         lbl_rol=Label(fondo3, text="Nuevo rol", font=("Inter", 24), bg="white")
         lbl_rol.pack(padx=20, pady=10)
@@ -290,6 +306,7 @@ class interfacesUsuario():
             nonlocal uid
             nuevo_nombre = nombre_entry.get().strip()
             passw_text = passw_entry.get().strip()
+            passw_text2= passw_entry2.get().strip()
             rol_text=rol_entry.get().strip()
             if not nuevo_nombre:
                 messagebox.showerror("Error", "El nombre no puede estar vacío.")
@@ -297,6 +314,8 @@ class interfacesUsuario():
             if uid is None:
                 messagebox.showerror("Error", "Id del usuario desconocido. No se puede modificar.")
                 return
+            if passw_text!=passw_text2:
+                messagebox.showerror("La contraseña no es igual, vuelva a intentarlo.")
             # Pedir contraseña antes de modificar
             pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_usuario)
             if pwd is None:
@@ -320,5 +339,4 @@ class interfacesUsuario():
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
-
 
