@@ -39,7 +39,7 @@ class InterfacesLogin():
         lbl_contrasenia=Label(contenedor_login, text="Contraseña", font=("Orlega One", 24), fg="Black", bg="white")
         lbl_contrasenia.pack()
 
-        contrasenia_entry=Entry(contenedor_login, font=("Orlega One", 24), fg="Black", bg="white")
+        contrasenia_entry=Entry(contenedor_login, font=("Orlega One", 24), fg="Black", bg="white", show="*")
         contrasenia_entry.pack()
 
         btn_ingresar=Button(contenedor_login, text="Ingresar", font=("Otomanopee One", 24), fg="#F1C045", bg="#A6171C", command=lambda: self.iniciar_sesion(ventana_login,usuario_entry.get(),contrasenia_entry.get()))
@@ -71,3 +71,4 @@ class InterfacesLogin():
         for widget in ventana_login.winfo_children():
 
             widget.destroy()
+
