@@ -38,6 +38,16 @@ class Productos_acciones():
             messagebox.showerror("Error", f"Error al obtener productos: {e}")
 
     @staticmethod
+    def obtener_todos_productos():
+        try:
+            conexionBD.cursor.execute("SELECT * FROM products")
+            productos = conexionBD.cursor.fetchall()
+            return productos
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al obtener productos: {e}")
+            return []
+
+    @staticmethod
     def obtener_productos():
         try:
             conexionBD.cursor.execute("SELECT * FROM products where products_category = 'Alimentos' ")

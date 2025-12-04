@@ -162,12 +162,6 @@ class interfacesIngrediente():
             confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el ingrediente?\nID: {id_ing}\nNombre: {name}")
             if not confirm:
                 return
-            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para eliminar:", show='*', parent=menu_ingredientes)
-            if pwd is None:
-                return
-            if pwd != ADMIN_PASSWORD:
-                messagebox.showerror("Error", "Contraseña incorrecta.")
-                return
             eliminado = metodos_ingredientes.Ingredientes_acciones.borrar(id_ing)
             if eliminado:
                 messagebox.showinfo("Éxito", "Ingrediente eliminado correctamente.")
@@ -220,14 +214,16 @@ class interfacesIngrediente():
             _row_buttons.clear()
             try:
                 items = metodos_ingredientes.Ingredientes_acciones.obtener_ingredientes()
+                num_ingredientes=1
                 for i, ing in enumerate(items):
                     # ing = (id, name, measurement_unit, quantity)
-                    iid = tabla.insert('', 'end', values=(ing[0], ing[1], ing[3], ing[2], ''), tags=('even' if i % 2 == 0 else 'odd',))
+                    iid = tabla.insert('', 'end', values=(num_ingredientes, ing[1], ing[3], ing[2], ''), tags=('even' if i % 2 == 0 else 'odd',))
                     btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
                     btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
                     btn_editar.config(command=lambda iid=iid, ing=ing: on_editar(iid, ing))
                     btn_borrar.config(command=lambda iid=iid, id_ing=ing[0], name=ing[1]: on_borrar(iid, id_ing, name))
                     _row_buttons[iid] = (btn_editar, btn_borrar)
+                    num_ingredientes+=1
             except Exception as e:
                 messagebox.showerror("Error", f"Error al cargar ingredientes: {e}")
 
@@ -465,13 +461,6 @@ class interfacesIngrediente():
                 float(new_qty)
             except Exception:
                 messagebox.showerror("Error", "Cantidad inválida.")
-                return
-            
-            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_ingrediente)
-            if pwd is None:
-                return
-            if pwd != ADMIN_PASSWORD:
-                messagebox.showerror("Error", "Contraseña incorrecta.")
                 return
 
             res = metodos_ingredientes.Ingredientes_acciones.modificar(new_name, new_unit, id_ingredient, new_prod, new_qty)

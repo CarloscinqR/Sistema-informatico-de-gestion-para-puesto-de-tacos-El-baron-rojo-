@@ -103,20 +103,13 @@ class interfacesProducto():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        productos = metodos_productos.Productos_acciones.obtener_productos()
+        productos = metodos_productos.Productos_acciones.obtener_todos_productos()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
         def on_borrar(iid, pid, pname):
             confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el producto?\nID: {pid}\nNombre: {pname}")
             if not confirm:
-                return
-
-            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para eliminar:", show='*', parent=menu_productos)
-            if pwd is None:
-                return
-            if pwd != '1234':
-                messagebox.showerror("Error", "Contraseña incorrecta.")
                 return
 
             eliminado = metodos_productos.Productos_acciones.borrar(pid)
@@ -156,7 +149,7 @@ class interfacesProducto():
                 self.modificarProducto(menu_productos, producto_tuple)
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
-
+        num_producto=1
         for i, producto in enumerate(productos):
             # DB order: id_product, product_name, products_category, unit_price
             # price is at index 3
@@ -168,7 +161,8 @@ class interfacesProducto():
             tag = 'even' if i % 2 == 0 else 'odd'
             # Insertar fila en la tabla (sin funciones)
             # producto tuple order: (id_product, product_name, products_category, unit_price)
-            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], producto[2], precio_text, ''), tags=(tag,))
+            item_id = tabla.insert('', 'end', values=(num_producto, producto[1], producto[2], precio_text, ''), tags=(tag,))
+            num_producto+=1
 
             btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
             btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
@@ -554,12 +548,6 @@ class interfacesProducto():
                 return
 
             # Pedir contraseña antes de modificar
-            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_producto)
-            if pwd is None:
-                return
-            if pwd != '1234':
-                messagebox.showerror("Error", "Contraseña incorrecta.")
-                return
 
             selected_category_mod = None
             try:
