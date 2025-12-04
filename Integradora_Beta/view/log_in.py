@@ -1,5 +1,8 @@
 from tkinter import *
+from tkinter import messagebox
 from view import menu_principal
+from model import metodos_usuarios
+
 class InterfacesLogin():
     def __init__(self,ventana_login):
         ventana_login.title("Login")
@@ -39,15 +42,32 @@ class InterfacesLogin():
         contrasenia_entry=Entry(contenedor_login, font=("Orlega One", 24), fg="Black", bg="white")
         contrasenia_entry.pack()
 
-        btn_ingresar=Button(contenedor_login, text="Ingresar", font=("Otomanopee One", 24), fg="#F1C045", bg="#A6171C", command=lambda: self.iniciar_sesion(ventana_login))
+        btn_ingresar=Button(contenedor_login, text="Ingresar", font=("Otomanopee One", 24), fg="#F1C045", bg="#A6171C", command=lambda: self.iniciar_sesion(ventana_login,usuario_entry.get(),contrasenia_entry.get()))
         btn_ingresar.pack(side=BOTTOM)
 
-    def iniciar_sesion(self,ventana_login):   
-        #usuario_texto = usuario_entry.get()
-        #contrasenia_texto = contrasenia_entry.get()
-        self.borrarPantalla(ventana_login)
-        menu_principal.interfacesMenu(ventana_login)
+    def iniciar_sesion(self,ventana_login,usuario_entry,contrasenia_entry): 
+          
+        usuario_texto = usuario_entry
+        contrasenia_texto = contrasenia_entry
+
+        if not usuario_texto and not contrasenia_texto:
+            messagebox.showerror("Error", "Ingresa un usuario y contraseña.")
+        else:
+            if not usuario_texto:
+                messagebox.showerror("Error", "Ingresa un usuario.")
+                return
+            if not contrasenia_texto:
+                messagebox.showerror("Error", "Ingresa una contraseña.")
+                return
+            else:
+                verification=metodos_usuarios.Usuarios_acciones.verificar_usuario(usuario_texto,contrasenia_texto)
+                if verification:
+                    self.borrarPantalla(ventana_login)
+                    menu_principal.interfacesMenu(ventana_login)
+                else:
+                    return
     
     def borrarPantalla(self,ventana_login):
         for widget in ventana_login.winfo_children():
+
             widget.destroy()
