@@ -38,19 +38,9 @@ class Productos_acciones():
             messagebox.showerror("Error", f"Error al obtener productos: {e}")
 
     @staticmethod
-    def obtener_todos_productos():
-        try:
-            conexionBD.cursor.execute("SELECT * FROM products")
-            productos = conexionBD.cursor.fetchall()
-            return productos
-        except Exception as e:
-            messagebox.showerror("Error", f"Error al obtener productos: {e}")
-            return []
-
-    @staticmethod
     def obtener_productos():
         try:
-            conexionBD.cursor.execute("SELECT * FROM products where products_category = 'Alimentos' ")
+            conexionBD.cursor.execute("SELECT * FROM products ")
             productos = conexionBD.cursor.fetchall()
             return productos
         except Exception as e:
@@ -133,4 +123,25 @@ class Productos_acciones():
             return False
         except Exception:
             return False
-        
+    @staticmethod
+    def obtener_ingredientes_producto(id_product):
+        try:
+            conexionBD.cursor.execute("SELECT id_ingredients FROM ingredients_details WHERE id_product = %s", (id_product,))
+            data = conexionBD.cursor.fetchall()
+            conexionBD.conexion.commit()
+            return [int(i[0]) for i in data]
+        except:
+            return []
+
+    @staticmethod
+    def actualizar_ingredientes(id_producto, nuevos_ids):
+        try:
+            conexionBD.cursor.execute("DELETE FROM ingredients_details WHERE id_product = %s", (id_producto,))
+            for ing in nuevos_ids:
+                conexionBD.cursor.execute("INSERT INTO ingredients_details (id_product, id_ingredients) VALUES (%s, %s)",
+                            (id_producto, ing))
+            conexionBD.conexion.commit()
+            return True
+        except:
+            return False
+    
