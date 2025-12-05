@@ -86,43 +86,69 @@ class Productos_acciones():
             return True
         except:
             return False
-        
+    
+    @staticmethod
+    def obtener_ingredientes():
+        try:
+            conexionBD.cursor.execute("SELECT id_ingredients, name FROM ingredients")
+            return conexionBD.cursor.fetchall()
+        except Exception as e:
+            print("ERROR OBTENER INGREDIENTES:", e)
+            return []
+
     @staticmethod
     def borrar(id_product):
         try:
+            # borrar relaciones con ingredientes
             conexionBD.cursor.execute(
-                "DELETE FROM products WHERE id_product=%s",
+                "DELETE FROM ingredients_details WHERE id_product = %s",
                 (id_product,)
             )
+
+            # borrar relaciones con pedidos
+            conexionBD.cursor.execute(
+                "DELETE FROM detail_order WHERE id_product = %s",
+                (id_product,)
+            )
+
+            # borrar producto
+            conexionBD.cursor.execute(
+                "DELETE FROM products WHERE id_product = %s",
+                (id_product,)
+            )
+
             conexionBD.conexion.commit()
-            # Si rowcount > 0, se eliminó algo
-            try:
-                return conexionBD.cursor.rowcount > 0
-            except Exception:
-                return True
-        except Exception:
+            return True
+        except Exception as e:
+            print("ERROR AL BORRAR PRODUCTO:", e)
             return False
+
 
     @staticmethod
     def agregar_ingredientes_detalle(id_product, ingredient_id):
         try:
             inserted_any = False
+
             for id_ingredients in ingredient_id:
                 try:
                     conexionBD.cursor.execute(
-                        "INSERT INTO ingredients_details (id_ingredients, id_product) VALUES (%s, %s)",
-                        (id_ingredients, id_product)
+                        "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
+                        (id_ingredients, id_product, 1)  #Medida temporaaal
                     )
                     inserted_any = True
-                except Exception:
-                    # seguir intentando con los demás
-                    pass
+                except Exception as e:
+                    print("ERROR INGREDIENTE:", e)
+
             if inserted_any:
                 conexionBD.conexion.commit()
                 return True
+
             return False
-        except Exception:
+
+        except Exception as e:
+            print("ERROR GENERAL:", e)
             return False
+
     @staticmethod
     def obtener_ingredientes_producto(id_product):
         try:
