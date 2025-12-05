@@ -347,10 +347,8 @@ class interfacesProducto():
             # Recolectar ingredientes seleccionados (cada variable devuelve el id del ingrediente o 0)
             selected_ings = []
             try:
-                for v in (ing_var_1, ing_var_2, ing_var_3, ing_var_4, ing_var_5):
-                    val = v.get()
-                    if val:
-                        selected_ings.append(val)
+                selected_ings = [v.get() for v in ingredientes_vars if v.get() != 0]
+
             except Exception:
                 selected_ings = []
 
@@ -369,25 +367,56 @@ class interfacesProducto():
         marco = Frame(inner, bg="white")
 
         # Variables asociadas a cada Checkbutton; onvalue = id del ingrediente en la BD
-        ing_var_1 = IntVar(value=0)
-        ing_var_2 = IntVar(value=0)
-        ing_var_3 = IntVar(value=0)
-        ing_var_4 = IntVar(value=0)
-        ing_var_5 = IntVar(value=0)
+        # ing_var_1 = IntVar(value=0)
+        # ing_var_2 = IntVar(value=0)
+        # ing_var_3 = IntVar(value=0)
+        # ing_var_4 = IntVar(value=0)
+        # ing_var_5 = IntVar(value=0)
+
+        # lbl_ingredientes = Label(inner, text="Ingredientes", font=("Inter", 24), bg="white")
+        # lbl_ingredientes.pack(padx=20, pady=10)
+        # # Asumimos ids de ingredientes: 1..5 (ajusta según tu BD real)
+        # ingrediente1=Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white", variable=ing_var_1, onvalue=1, offvalue=0)
+        # ingrediente1.grid(row=0, column=0, padx=20, pady=5)
+        # ingrediente2=Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white", variable=ing_var_2, onvalue=2, offvalue=0)
+        # ingrediente2.grid(row=0, column=1, padx=20, pady=5)
+        # ingrediente3=Checkbutton(marco, text="Carne asada", font=("Inter", 18), bg="white", variable=ing_var_3, onvalue=3, offvalue=0)
+        # ingrediente3.grid(row=0, column=2, padx=20, pady=5)
+        # ingrediente4=Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white", variable=ing_var_4, onvalue=4, offvalue=0)
+        # ingrediente4.grid(row=1, column=0, padx=20, pady=5)
+        # ingrediente5=Checkbutton(marco, text="Queso", font=("Inter", 18), bg="white", variable=ing_var_5, onvalue=5, offvalue=0)
+        # ingrediente5.grid(row=1, column=1, padx=20, pady=5)
+        # === INGREDIENTES DESDE BD ===
+        ingredientes = metodos_productos.Productos_acciones.obtener_ingredientes()
+
+        ingredientes_vars = []
 
         lbl_ingredientes = Label(inner, text="Ingredientes", font=("Inter", 24), bg="white")
         lbl_ingredientes.pack(padx=20, pady=10)
-        # Asumimos ids de ingredientes: 1..5 (ajusta según tu BD real)
-        ingrediente1=Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white", variable=ing_var_1, onvalue=1, offvalue=0)
-        ingrediente1.grid(row=0, column=0, padx=20, pady=5)
-        ingrediente2=Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white", variable=ing_var_2, onvalue=2, offvalue=0)
-        ingrediente2.grid(row=0, column=1, padx=20, pady=5)
-        ingrediente3=Checkbutton(marco, text="Carne asada", font=("Inter", 18), bg="white", variable=ing_var_3, onvalue=3, offvalue=0)
-        ingrediente3.grid(row=0, column=2, padx=20, pady=5)
-        ingrediente4=Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white", variable=ing_var_4, onvalue=4, offvalue=0)
-        ingrediente4.grid(row=1, column=0, padx=20, pady=5)
-        ingrediente5=Checkbutton(marco, text="Queso", font=("Inter", 18), bg="white", variable=ing_var_5, onvalue=5, offvalue=0)
-        ingrediente5.grid(row=1, column=1, padx=20, pady=5)
+
+        marco = Frame(inner, bg="white")
+        marco.pack(padx=20, pady=10)
+
+        columnas = 3
+
+        for i, (id_ing, nombre) in enumerate(ingredientes):
+            var = IntVar(value=0)
+            chk = Checkbutton(
+                marco,
+                text=nombre,
+                variable=var,
+                onvalue=id_ing,
+                offvalue=0,
+                font=("Inter", 18),
+                bg="white"
+            )
+
+            fila = i // columnas
+            col = i % columnas
+            chk.grid(row=fila, column=col, padx=20, pady=5)
+            ingredientes_vars.append(var)
+
+
         marco.pack(padx=20, pady=10)
 
 
@@ -530,11 +559,33 @@ class interfacesProducto():
             ingredientes_actuales = []
 
         # VARIABLES DE INGREDIENTES
-        ing_var_1 = IntVar(value=1 if 1 in ingredientes_actuales else 0)
-        ing_var_2 = IntVar(value=1 if 2 in ingredientes_actuales else 0)
-        ing_var_3 = IntVar(value=1 if 3 in ingredientes_actuales else 0)
-        ing_var_4 = IntVar(value=1 if 4 in ingredientes_actuales else 0)
-        ing_var_5 = IntVar(value=1 if 5 in ingredientes_actuales else 0)
+        # ing_var_1 = IntVar(value=1 if 1 in ingredientes_actuales else 0)
+        # ing_var_2 = IntVar(value=1 if 2 in ingredientes_actuales else 0)
+        # ing_var_3 = IntVar(value=1 if 3 in ingredientes_actuales else 0)
+        # ing_var_4 = IntVar(value=1 if 4 in ingredientes_actuales else 0)
+        # ing_var_5 = IntVar(value=1 if 5 in ingredientes_actuales else 0)
+
+        # lbl_ingredientes = Label(inner_mod, text="Ingredientes", font=("Inter", 24), bg="white")
+        # lbl_ingredientes.pack(padx=20, pady=10)
+
+        # marco = Frame(inner_mod, bg="white")
+        # marco.pack(padx=20, pady=10)
+
+        # Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white", variable=ing_var_1, onvalue=1, offvalue=0).grid(row=0, column=0, padx=20, pady=5)
+        # Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white", variable=ing_var_2, onvalue=2, offvalue=0).grid(row=0, column=1, padx=20, pady=5)
+        # Checkbutton(marco, text="Carne asada", font=("Inter", 18), bg="white", variable=ing_var_3, onvalue=3, offvalue=0).grid(row=0, column=2, padx=20, pady=5)
+        # Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white", variable=ing_var_4, onvalue=4, offvalue=0).grid(row=1, column=0, padx=20, pady=5)
+        # Checkbutton(marco, text="Queso", font=("Inter", 18), bg="white", variable=ing_var_5, onvalue=5, offvalue=0).grid(row=1, column=1, padx=20, pady=5)
+
+        # Obtener ingredientes existentes del producto
+        ingredientes_actuales = []
+        if pid:
+            ingredientes_actuales = metodos_productos.Productos_acciones.obtener_ingredientes_producto(pid)
+
+        # Obtener ingredientes desde BD
+        ingredientes = metodos_productos.Productos_acciones.obtener_ingredientes()
+
+        ingredientes_vars = []
 
         lbl_ingredientes = Label(inner_mod, text="Ingredientes", font=("Inter", 24), bg="white")
         lbl_ingredientes.pack(padx=20, pady=10)
@@ -542,11 +593,28 @@ class interfacesProducto():
         marco = Frame(inner_mod, bg="white")
         marco.pack(padx=20, pady=10)
 
-        Checkbutton(marco, text="Tortilla de maíz", font=("Inter", 18), bg="white", variable=ing_var_1, onvalue=1, offvalue=0).grid(row=0, column=0, padx=20, pady=5)
-        Checkbutton(marco, text="Tortilla de harina", font=("Inter", 18), bg="white", variable=ing_var_2, onvalue=2, offvalue=0).grid(row=0, column=1, padx=20, pady=5)
-        Checkbutton(marco, text="Carne asada", font=("Inter", 18), bg="white", variable=ing_var_3, onvalue=3, offvalue=0).grid(row=0, column=2, padx=20, pady=5)
-        Checkbutton(marco, text="Carne adobada", font=("Inter", 18), bg="white", variable=ing_var_4, onvalue=4, offvalue=0).grid(row=1, column=0, padx=20, pady=5)
-        Checkbutton(marco, text="Queso", font=("Inter", 18), bg="white", variable=ing_var_5, onvalue=5, offvalue=0).grid(row=1, column=1, padx=20, pady=5)
+        columnas = 3
+
+        for i, (id_ing, nombre) in enumerate(ingredientes):
+            valor_inicial = id_ing if id_ing in ingredientes_actuales else 0
+
+            var = IntVar(value=valor_inicial)
+
+            chk = Checkbutton(
+                marco,
+                text=nombre,
+                variable=var,
+                onvalue=id_ing,
+                offvalue=0,
+                font=("Inter", 18),
+                bg="white"
+            )
+
+            fila = i // columnas
+            col = i % columnas
+            chk.grid(row=fila, column=col, padx=20, pady=5)
+
+            ingredientes_vars.append(var)
 
         def on_modificar():
             nonlocal pid
@@ -580,11 +648,7 @@ class interfacesProducto():
                 selected_category_mod = None
 
             modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
-            nuevos_ingredientes = []
-            for v in (ing_var_1, ing_var_2, ing_var_3, ing_var_4, ing_var_5):
-                val = v.get()
-                if val:
-                    nuevos_ingredientes.append(val)
+            nuevos_ingredientes = [v.get() for v in ingredientes_vars if v.get() != 0]
 
             metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
 
