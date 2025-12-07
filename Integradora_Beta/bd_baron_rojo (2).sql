@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 06, 2025 at 04:54 PM
+-- Generation Time: Dec 07, 2025 at 05:41 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -67,19 +67,21 @@ CREATE TABLE `ingredients_details` (
   `id_ingredientsdetail` int(11) NOT NULL,
   `id_ingredients` int(11) NOT NULL,
   `id_product` int(11) NOT NULL,
-  `quntity` int(3) NOT NULL
+  `quantity` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `ingredients_details`
 --
 
-INSERT INTO `ingredients_details` (`id_ingredientsdetail`, `id_ingredients`, `id_product`, `quntity`) VALUES
+INSERT INTO `ingredients_details` (`id_ingredientsdetail`, `id_ingredients`, `id_product`, `quantity`) VALUES
 (21, 2, 5, 0),
 (22, 3, 5, 0),
 (23, 1, 21, 1),
 (24, 3, 21, 1),
-(25, 5, 21, 1);
+(25, 5, 21, 1),
+(26, 2, 24, 1),
+(27, 5, 24, 123);
 
 -- --------------------------------------------------------
 
@@ -120,7 +122,10 @@ INSERT INTO `products` (`id_product`, `product_name`, `products_category`, `unit
 (9, 'El BB', 'Especiales', 140.00),
 (10, 'Alambre el baron', 'Especiales', 125.00),
 (15, 'refresco', 'Bebida', 20.00),
-(21, 'gringa taco', 'Especiales', 120.00);
+(21, 'gringa taco', 'Especiales', 120.00),
+(22, 'ssss', 'Especiales', 123.00),
+(23, 'wwww', 'Especiales', 222.00),
+(24, 'ssss', 'Especiales', 222.00);
 
 -- --------------------------------------------------------
 
@@ -210,7 +215,7 @@ ALTER TABLE `ingredients`
 -- AUTO_INCREMENT for table `ingredients_details`
 --
 ALTER TABLE `ingredients_details`
-  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -222,7 +227,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `user`
