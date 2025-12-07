@@ -125,20 +125,18 @@ class Productos_acciones():
 
 
     @staticmethod
-    def agregar_ingredientes_detalle(id_product, ingredient_id):
+    def agregar_ingredientes_detalle(id_product, ingredientes):
         try:
             inserted_any = False
 
-            for id_ingredients in ingredient_id:
+            for id_ing, cantidad in ingredientes:
                 try:
                     conexionBD.cursor.execute(
-                        "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
-                        (id_ingredients, id_product, 1)  #Medida temporaaal
-                    )
+                        "INSERT INTO ingredients_details (id_ingredients, id_product, quantity) VALUES (%s, %s, %s)",(id_ing, id_product, cantidad))
                     inserted_any = True
                 except Exception as e:
-                    print("ERROR INGREDIENTE:", e)
-
+                    print(f"ERROR INGREDIENTE (id={id_ing}):", e)
+                    # continúa con los demás
             if inserted_any:
                 conexionBD.conexion.commit()
                 return True
@@ -148,6 +146,7 @@ class Productos_acciones():
         except Exception as e:
             print("ERROR GENERAL:", e)
             return False
+
 
     @staticmethod
     def obtener_ingredientes_producto(id_product):
@@ -160,14 +159,16 @@ class Productos_acciones():
             return []
 
     @staticmethod
-    def actualizar_ingredientes(id_producto, nuevos_ids):
+    def actualizar_ingredientes(id_producto, ingredientes):
         try:
-            conexionBD.cursor.execute("DELETE FROM ingredients_details WHERE id_product = %s", (id_producto,))
-            for ing in nuevos_ids:
-                conexionBD.cursor.execute("INSERT INTO ingredients_details (id_product, id_ingredients) VALUES (%s, %s)",
-                            (id_producto, ing))
+            conexionBD.cursor.execute("DELETE FROM ingredients_details WHERE id_product = %s",(id_producto,))
+            for id_ing, cantidad in ingredientes:
+                conexionBD.cursor.execute("INSERT INTO ingredients_details (id_product, id_ingredients, quantity) VALUES (%s, %s, %s)",(id_producto, id_ing, cantidad))
             conexionBD.conexion.commit()
             return True
-        except:
+
+        except Exception as e:
+            print("ERROR actualizar_ingredientes:", e)
             return False
+
     
