@@ -25,17 +25,22 @@ class Productos_acciones():
     @staticmethod
     def mostrar_productos():
         try:
-            conexionBD.cursor.execute("SELECT * FROM products ORDER BY products_category")
+            conexionBD.cursor.execute("SELECT * FROM products")
             productos = conexionBD.cursor.fetchall()
-            return productos
+
+            texto_productos = ""
+            for producto in productos:
+                # DB order: id_product, product_name, products_category, unit_price
+                texto_productos += f"ID: {producto[0]}, Nombre: {producto[1]}, Precio Unitario: {producto[3]}\n"
+            etiqueta_productos = Label(productos.contenedor_botones, text=texto_productos, font=("Inter", 16), bg="white", justify=LEFT)
+            etiqueta_productos.pack(padx=20, pady=10)
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener productos: {e}")
-            return []
 
     @staticmethod
     def obtener_productos():
         try:
-            conexionBD.cursor.execute("SELECT * FROM products where products_category = 'Alimentos'  ")
+            conexionBD.cursor.execute("SELECT * FROM products ")
             productos = conexionBD.cursor.fetchall()
             return productos
         except Exception as e:
@@ -65,23 +70,27 @@ class Productos_acciones():
     @staticmethod
     def modificar_producto(nuevo_nombre, nuevo_precio, id_product=None, products_category=None):
         try:
-            # Update product information; category is optional
+            conexionBD.reconectar()  # ← agregado
+
             if products_category is None:
                 conexionBD.cursor.execute(
                     "UPDATE products SET product_name=%s, unit_price=%s WHERE id_product=%s",
                     (nuevo_nombre, nuevo_precio, id_product)
                 )
             else:
-                # update name, category and price; column name is products_category
                 conexionBD.cursor.execute(
                     "UPDATE products SET product_name=%s, products_category=%s, unit_price=%s WHERE id_product=%s",
                     (nuevo_nombre, products_category, nuevo_precio, id_product)
                 )
+
             conexionBD.conexion.commit()
             return True
-        except:
+
+        except Exception as e:
+            print("ERROR modificar_producto:", e)
             return False
-    
+
+
     @staticmethod
     def obtener_ingredientes():
         try:
@@ -142,7 +151,6 @@ class Productos_acciones():
             print("ERROR GENERAL:", e)
             return False
 
-
     @staticmethod
     def obtener_ingredientes_producto(id_product):
         try:
@@ -155,15 +163,21 @@ class Productos_acciones():
 
     @staticmethod
     def actualizar_ingredientes(id_producto, ingredientes):
-
         try:
-            conexionBD.cursor.execute("DELETE FROM ingredients_details WHERE id_product = %s",(id_producto,))
+            conexionBD.reconectar()  # ← agregado
+
+            conexionBD.cursor.execute(
+                "DELETE FROM ingredients_details WHERE id_product = %s",
+                (id_producto,)
+            )
+
             for id_ing, cantidad in ingredientes:
-                print(id_ing)
-                print(cantidad) 
-                conexionBD.cursor.execute("INSERT INTO ingredients_details (id_product, id_ingredients, quantity) VALUES (%s, %s, %s)",(id_producto, id_ing, cantidad))
-            print(id_ing)
-            print(cantidad)
+                conexionBD.cursor.execute(
+                    "INSERT INTO ingredients_details (id_product, id_ingredients, quantity) "
+                    "VALUES (%s, %s, %s)",
+                    (id_producto, id_ing, cantidad)
+                )
+
             conexionBD.conexion.commit()
             return True
 
@@ -171,4 +185,29 @@ class Productos_acciones():
             print("ERROR actualizar_ingredientes:", e)
             return False
 
-    
+        
+    @staticmethod
+    def obtener_ingredientes_con_cantidad(id_product):
+        try:
+            conexionBD.cursor.execute(
+                "SELECT id_ingredients, quantity FROM ingredients_details WHERE id_product = %s",
+                (id_product,)
+            )
+            rows = conexionBD.cursor.fetchall()
+            # normalizamos a int keys y cantidades (pueden ser int o float según tu uso)
+            result = {}
+            for r in rows:
+                try:
+                    k = int(r[0])
+                    v = r[1]
+                    # si quieres forzar int: v = int(v)
+                    result[k] = v
+                except Exception:
+                    continue
+            conexionBD.conexion.close()
+            return result
+        except Exception as e:
+            print("ERROR obtener_ingredientes_con_cantidad:", e)
+            return {}
+
+
