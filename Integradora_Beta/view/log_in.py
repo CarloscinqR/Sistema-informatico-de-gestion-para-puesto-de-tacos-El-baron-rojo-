@@ -39,6 +39,7 @@ class InterfacesLogin():
         lbl_contrasenia=Label(contenedor_login, text="Contraseña", font=("Orlega One", 24), fg="Black", bg="white")
         lbl_contrasenia.pack()
 
+        contrasenia_entry=Entry(contenedor_login, font=("Orlega One", 24), fg="Black", bg="white")
         contrasenia_entry=Entry(contenedor_login, font=("Orlega One", 24), fg="Black", bg="white", show="*")
         contrasenia_entry.pack()
 
@@ -46,7 +47,7 @@ class InterfacesLogin():
         btn_ingresar.pack(side=BOTTOM)
 
     def iniciar_sesion(self,ventana_login,usuario_entry,contrasenia_entry): 
-          
+
         usuario_texto = usuario_entry
         contrasenia_texto = contrasenia_entry
 
@@ -66,9 +67,8 @@ class InterfacesLogin():
                     menu_principal.interfacesMenu(ventana_login)
                 else:
                     return
-    
+
     def borrarPantalla(self,ventana_login):
         for widget in ventana_login.winfo_children():
 
             widget.destroy()
-

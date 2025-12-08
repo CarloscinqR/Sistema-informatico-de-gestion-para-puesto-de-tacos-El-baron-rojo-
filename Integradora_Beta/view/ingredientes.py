@@ -103,32 +103,30 @@ class interfacesIngrediente():
                         font=('Orelega One', 16))
         style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
 
-        columns = ('Id_ingrediente', 'Nombre', 'Cantidad', 'Unidad', 'Acciones')
+        columns = ('Id_ingrediente', 'Nombre', 'Unidad', 'Acciones')
 
         header_frame = Frame(contenedor_tabla, bg='#A6171C')
         header_frame.pack(fill='x', padx=20, pady=(10, 0))
         header_frame.columnconfigure(0, weight=120)
         header_frame.columnconfigure(1, weight=380)
-        header_frame.columnconfigure(2, weight=120)
         header_frame.columnconfigure(3, weight=120)
         header_frame.columnconfigure(4, weight=260)
 
         lbl_h_id = Label(header_frame, text='Id_ingrediente', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
         lbl_h_nombre = Label(header_frame, text='Nombre', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='w')
-        lbl_h_cant = Label(header_frame, text='Cantidad', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
+        
         lbl_h_unidad = Label(header_frame, text='Unidad', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
         lbl_h_acciones = Label(header_frame, text='Acciones', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
 
         lbl_h_id.grid(row=0, column=0, sticky='we', padx=(4,2))
         lbl_h_nombre.grid(row=0, column=1, sticky='we', padx=2)
-        lbl_h_cant.grid(row=0, column=2, sticky='we', padx=2)
+        
         lbl_h_unidad.grid(row=0, column=3, sticky='we', padx=2)
         lbl_h_acciones.grid(row=0, column=4, sticky='we', padx=(2,4))
 
         tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='', selectmode='browse')
         tabla.column('Id_ingrediente', width=120, anchor=CENTER)
         tabla.column('Nombre', width=380, anchor=W)
-        tabla.column('Cantidad', width=120, anchor=CENTER)
         tabla.column('Unidad', width=120, anchor=CENTER)
         tabla.column('Acciones', width=260, anchor=CENTER)
 
@@ -217,7 +215,7 @@ class interfacesIngrediente():
                 num_ingredientes=1
                 for i, ing in enumerate(items):
                     # ing = (id, name, measurement_unit, quantity)
-                    iid = tabla.insert('', 'end', values=(num_ingredientes, ing[1], ing[3], ing[2], ''), tags=('even' if i % 2 == 0 else 'odd',))
+                    iid = tabla.insert('', 'end', values=(num_ingredientes, ing[1], ing[2], ''), tags=('even' if i % 2 == 0 else 'odd',))
                     btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
                     btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
                     btn_editar.config(command=lambda iid=iid, ing=ing: on_editar(iid, ing))
@@ -286,82 +284,52 @@ class interfacesIngrediente():
         btn_regresar_bottom.pack(side=RIGHT, padx=10, pady=10)
 
     def nuevoIngrediente(self, nuevo_ingrediente):
-        """Add a new ingredient via a small form."""
         self.borrarPantalla(nuevo_ingrediente)
-        nuevo_ingrediente.title("Nuevo ingrediente")
-        # Keep same size as main menu (do not shrink)
-        try:
-            nuevo_ingrediente.state("zoomed")
-        except Exception:
-            # fallback: keep current geometry
-            pass
+        nuevo_ingrediente.title("Agregar ingrediente")
+        nuevo_ingrediente.geometry("1920x1080")
+        nuevo_ingrediente.state("zoomed")
 
-        fondo = Frame(nuevo_ingrediente, bg="#D6D0C5")
-        fondo.pack(fill='both', expand=True)
+        fondo=Frame(nuevo_ingrediente, bg="#D6D0C5")
+        fondo.pack_propagate(False)
+        fondo.pack(fill="both", expand=True)
 
-        fondo2 = Frame(fondo, bg="#A6171C")
-        fondo2.pack(padx=40, pady=40, fill='both', expand=True)
+        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
+        fondo2.pack_propagate(False)
+        fondo2.pack(padx=99, pady=50)
 
-        lbl_nombre = Label(fondo2, text="Nombre", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
+        lbl_titulo=Label(fondo2, text="Ingredientes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
+        lbl_titulo.pack(padx=20, pady=20)
+
+        fondo3=Frame(fondo2, bg="white", height=180)
+        fondo3.pack(expand=True)
+
+        lbl_nombre=Label(fondo3, text="Ingrediente", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
-        ent_nombre = Entry(fondo2, font=("Inter", 14))
+        
+        nomb=StringVar()
+        ent_nombre=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=nomb)
         ent_nombre.pack(padx=20, pady=10)
 
-        lbl_unit = Label(fondo2, text="Unidad de medida", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
+        lbl_unit=Label(fondo3, text="Unidad de pesaje/medida", font=("Inter", 24), bg="white")
         lbl_unit.pack(padx=20, pady=10)
-        ent_unit = Entry(fondo2, font=("Inter", 14))
+
+        unit=StringVar()
+        ent_unit=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=unit)
         ent_unit.pack(padx=20, pady=10)
-
-        # Link to product (required)
-        lbl_id_prod = Label(fondo2, text="Producto", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
-        lbl_id_prod.pack(padx=20, pady=10)
-        # Load product names for convenience (if available)
-        products = metodos_productos.Productos_acciones.obtener_productos() if hasattr(metodos_productos.Productos_acciones, 'obtener_productos') else []
-        # Build mapping name -> id and id -> name
-        prod_id_by_name = {str(p[1]): p[0] for p in products} if products else {}
-        prod_name_by_id = {p[0]: str(p[1]) for p in products} if products else {}
-        prod_names = list(prod_id_by_name.keys()) if prod_id_by_name else []
-        cb_prod = ttk.Combobox(fondo2, values=prod_names, state='readonly')
-        if prod_names:
-            cb_prod.set(prod_names[0])
-        cb_prod.pack(padx=20, pady=10)
-
-        lbl_qty = Label(fondo2, text="Cantidad", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
-        lbl_qty.pack(padx=20, pady=10)
-        ent_qty = Entry(fondo2, font=("Inter", 14))
-        ent_qty.pack(padx=20, pady=10)
 
         def on_save():
             name = ent_nombre.get().strip()
             unit = ent_unit.get().strip()
-            prod_name = cb_prod.get().strip()
-            qty = ent_qty.get().strip()
-            
+
             if not name:
                 messagebox.showerror("Error", "El nombre es requerido.")
                 return
             if not unit:
                 messagebox.showerror("Error", "La unidad de medida es requerida.")
                 return
-            if not prod_name:
-                messagebox.showerror("Error", "El producto es requerido.")
-                return
-            if not qty:
-                messagebox.showerror("Error", "La cantidad es requerida.")
-                return
             
-            id_prod = prod_id_by_name.get(prod_name)
-            if id_prod is None:
-                messagebox.showerror("Error", "Producto seleccionado inválido.")
-                return
-            
-            try:
-                float(qty)
-            except Exception:
-                messagebox.showerror("Error", "Cantidad inválida.")
-                return
 
-            new_id = metodos_ingredientes.Ingredientes_acciones.agregar(name, unit, id_prod, qty)
+            new_id = metodos_ingredientes.Ingredientes_acciones.agregar(name, unit)
             if not new_id:
                 messagebox.showerror("Error", "No se pudo agregar ingrediente.")
                 return
@@ -369,9 +337,9 @@ class interfacesIngrediente():
             self.menu_ingrediente(nuevo_ingrediente)
 
         # Save directly (no UI length limit for measurement unit; DB may constrain length)
-        btn_save = Button(fondo2, text='Guardar', command=on_save, bg='#F1C045')
+        btn_save = Button(fondo3, text='Guardar', command=on_save, bg='#F1C045',font=("Inter", 24))
         btn_save.pack(padx=20, pady=20)
-        btn_cancel = Button(fondo2, text='Cancelar', command=lambda: self.menu_ingrediente(nuevo_ingrediente), bg='#F1C045')
+        btn_cancel = Button(fondo3, text='Cancelar', command=lambda: self.menu_ingrediente(nuevo_ingrediente), bg='#F1C045',font=("Inter", 24))
         btn_cancel.pack(padx=20, pady=10)
 
     def modificarIngrediente(self, modificar_ingrediente, id_ingredient):

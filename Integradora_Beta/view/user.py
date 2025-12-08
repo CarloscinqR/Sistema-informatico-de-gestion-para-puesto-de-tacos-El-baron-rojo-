@@ -88,14 +88,6 @@ class interfacesUsuario():
             confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el usuario?\nID: {uid}\nNombre: {uname}")
             if not confirm:
                 return
-
-            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para eliminar:", show='*', parent=menu_usuarios)
-            if pwd is None:
-                return
-            if pwd != '1234':
-                messagebox.showerror("Error", "Contraseña incorrecta.")
-                return
-
             eliminado = metodos_usuarios.Usuarios_acciones.borrar(uid)
             if eliminado:
                 messagebox.showinfo("Éxito", "Usuario eliminado correctamente.")
@@ -130,18 +122,24 @@ class interfacesUsuario():
                 self.modificarUsuario(menu_usuarios, (uid,uname,upassw,urol))
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
-
+        
         for i, user in enumerate(usuarios):
             # producto es una tupla (id_prduct, prduct_name, unit_price)
             tag = 'even' if i % 2 == 0 else 'odd'
             # Insertar fila en la tabla (sin funciones)
-            item_id = tabla.insert('', 'end', values=(user[0], user[1], user[3], user[4],user[6],''), tags=(tag,))
+            if user[4]==None:
+                fecha_el="-----"
+            else:
+                fecha_el=user[4]
+            
+            item_id = tabla.insert('', 'end', values=(i+1, user[1], user[3], fecha_el,user[6],''), tags=(tag,))
 
             # Crear botones visibles sobre la Treeview en la columna 'Acciones'
             # Los botones no tienen comando (no funcionales)
             btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1], upassw=user[2],urol=user[6]: on_editar(iid, uid, uname, upassw,urol))
             btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1]: on_borrar(iid, uid, uname))
             _row_buttons[item_id] = (btn_editar, btn_borrar)
+
 
         # Forzar dibujo y posicionar los botones sobre cada celda 'Acciones'
         menu_usuarios.update_idletasks()
@@ -203,7 +201,7 @@ class interfacesUsuario():
 
         fondo3=Frame(fondo2, bg="white", height=180)
         fondo3.pack(expand=True)
-
+        
         lbl_nombre=Label(fondo3, text="Nombre", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
         
@@ -211,37 +209,33 @@ class interfacesUsuario():
         nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=nomb)
         nombre_entry.pack(padx=20, pady=10)
 
-        lbl_contrasenia=Label(fondo3, text="contraseña", font=("Inter", 24), bg="white")
+        lbl_contrasenia=Label(fondo3, text="Contraseña", font=("Inter", 24), bg="white")
         lbl_contrasenia.pack(padx=20, pady=10)
 
         contr=StringVar()
-        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr,show="*")
+        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr)
         contrasenia_entry.pack(padx=20, pady=10)
 
-        lbl_passw2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
-        lbl_passw2.pack(padx=20, pady=10)
-
-        passw_entry2=Entry(fondo3, font=("Inter", 24), bg="white",show="*")
-        passw_entry2.pack(padx=20, pady=10)
-
-        def comparar_contrasenias():
-            if contrasenia_entry.get()!=passw_entry2.get():
-                messagebox.showerror(message="Las contraseñas no coinciden, intentelo de nuevo.")
+        lbl_contrasenia2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
+        lbl_contrasenia2.pack(padx=20, pady=10)
+        contr2=StringVar()
+        contrasenia2_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr2)
+        contrasenia2_entry.pack(padx=20, pady=10)
 
         lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
         lbl_rol.pack(padx=20, pady=10)
-        rol=StringVar()
-        rol.set("Administrador")
-        menu=OptionMenu(fondo3,rol,"Administrador","Empleado")
-        menu.pack(padx=20,pady=10)
-        
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: {funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),rol.get())),comparar_contrasenias()})
-        btn_agregar.pack(padx=20, pady=10)
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 14), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
+        roles=["Administrador","Empleado"]
+        rol_cbx=ttk.Combobox(fondo3,values=roles,font=("Inter", 24),state="readonly")
+        rol_cbx.set(roles[0])
+        rol_cbx.pack()
+        
+
+        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
         btn_regresar.pack(padx=20, pady=10)
         
-        
+        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),contr2.get(),rol_cbx.get())))
+        btn_agregar.pack(padx=20, pady=10)
 
     def modificarUsuario(self,modificar_usuario,usuario=None):
         self.borrarPantalla(modificar_usuario)
@@ -271,60 +265,56 @@ class interfacesUsuario():
             try:
                 uid = usuario[0]
                 initial_name = usuario[1]
-                initial_passw=usuario[2]
                 initial_rol = usuario[3]
             except Exception:
                 uid = None
 
-        lbl_nombre=Label(fondo3, text="Nuevo nombre del usuario", font=("Inter", 24), bg="white")
+        lbl_nombre=Label(fondo3, text="Nombre del usuario", font=("Inter", 24), bg="white")
         lbl_nombre.pack(padx=20, pady=10)
         
         nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
         nombre_entry.insert(0, initial_name)
         nombre_entry.pack(padx=20, pady=10)
 
-        lbl_passw=Label(fondo3, text="Nueva contraseña", font=("Inter", 24), bg="white")
+        lbl_passw=Label(fondo3, text="Contraseña", font=("Inter", 24), bg="white")
         lbl_passw.pack(padx=20, pady=10)
 
-        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white",show="*")
+        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        passw_entry.insert(0, initial_passw)
         passw_entry.pack(padx=20, pady=10)
 
         lbl_passw2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
         lbl_passw2.pack(padx=20, pady=10)
 
-        passw_entry2=Entry(fondo3, font=("Inter", 24), bg="white",show="*")
+        passw_entry2=Entry(fondo3, font=("Inter", 24), bg="white")
+        passw_entry2.insert(0, initial_passw)
         passw_entry2.pack(padx=20, pady=10)
 
-        lbl_rol=Label(fondo3, text="Nuevo rol", font=("Inter", 24), bg="white")
-        lbl_rol.pack(padx=20, pady=10)
 
-        rol_entry=Entry(fondo3, font=("Inter", 24), bg="white")
-        rol_entry.insert(0, initial_rol)
-        rol_entry.pack(padx=20, pady=10)
+        lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
+        lbl_rol.pack(padx=20, pady=10)
+        roles=["Administrador","Empleado"]
+        rol_cbx=ttk.Combobox(fondo3,values=roles,font=("Inter", 24),state="readonly")
+        rol_cbx.set(initial_rol)
+        rol_cbx.pack()
+
+
 
         def on_modificar():
             nonlocal uid
             nuevo_nombre = nombre_entry.get().strip()
             passw_text = passw_entry.get().strip()
-            passw_text2= passw_entry2.get().strip()
-            rol_text=rol_entry.get().strip()
+            passw2_text=passw_entry2.get().strip()
+            rol_text=rol_cbx.get().strip()
             if not nuevo_nombre:
                 messagebox.showerror("Error", "El nombre no puede estar vacío.")
                 return
             if uid is None:
                 messagebox.showerror("Error", "Id del usuario desconocido. No se puede modificar.")
                 return
-            if passw_text!=passw_text2:
-                messagebox.showerror("La contraseña no es igual, vuelva a intentarlo.")
             # Pedir contraseña antes de modificar
-            pwd = simpledialog.askstring("Autorización", "Ingrese la contraseña para modificar:", show='*', parent=modificar_usuario)
-            if pwd is None:
-                return
-            if pwd != '1234':
-                messagebox.showerror("Error", "Contraseña incorrecta.")
-                return
 
-            modificado = metodos_usuarios.Usuarios_acciones.modificar_usuario(nuevo_nombre, passw_text,rol_text,uid)
+            modificado = metodos_usuarios.Usuarios_acciones.modificar_usuario(nuevo_nombre, passw_text,passw2_text,rol_text,uid)
             if modificado:
                 messagebox.showinfo("Éxito", "Usuario modificado correctamente.")
                 self.menu_usuario(modificar_usuario)
@@ -339,4 +329,5 @@ class interfacesUsuario():
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
+
 

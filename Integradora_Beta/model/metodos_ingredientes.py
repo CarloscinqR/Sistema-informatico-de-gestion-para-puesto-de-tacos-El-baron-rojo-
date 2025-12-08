@@ -4,34 +4,13 @@ from tkinter import messagebox
 
 class Ingredientes_acciones:
     @staticmethod
-    def agregar(name, measurement_unit, id_product, quantity):
+    def agregar(name, measurement_unit):
         try:
             # name, measurement_unit, id_product and quantity are required
             if not name or not measurement_unit:
                 messagebox.showerror("Error", "Nombre y unidad de medida son requeridos.")
                 return False
-            
-            if id_product is None:
-                messagebox.showerror("Error", "Producto es requerido.")
-                return False
-            
-            try:
-                idp = int(id_product)
-            except Exception:
-                messagebox.showerror("Error", "ID de producto inválido.")
-                return False
-            
-            conexionBD.cursor.execute("SELECT id_product FROM products WHERE id_product=%s", (idp,))
-            if not conexionBD.cursor.fetchone():
-                messagebox.showerror("Error", "Producto no existe.")
-                return False
-            
-            # quantity is required; validate it
-            try:
-                qty = int(quantity) if quantity else 0
-            except Exception:
-                messagebox.showerror("Error", "Cantidad inválida.")
-                return False
+
             
             # Insert into ingredients table (only has: id_ingredients, name, measurement_unit)
             conexionBD.cursor.execute(
@@ -40,11 +19,6 @@ class Ingredientes_acciones:
             )
             ing_id = conexionBD.cursor.lastrowid
             
-            # Create the relationship in ingredients_details with quantity
-            conexionBD.cursor.execute(
-                "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
-                (ing_id, idp, qty)
-            )
             
             conexionBD.conexion.commit()
             return ing_id
@@ -87,9 +61,7 @@ class Ingredientes_acciones:
         try:
             # Get ingredients with their quantity from ingredients_details
             conexionBD.cursor.execute("""
-                SELECT i.id_ingredients, i.name, i.measurement_unit, COALESCE(d.quntity, 0) as quantity
-                FROM ingredients i
-                LEFT JOIN ingredients_details d ON i.id_ingredients = d.id_ingredients
+                SELECT * from ingredients
             """)
             ingredientes = conexionBD.cursor.fetchall()
             return ingredientes

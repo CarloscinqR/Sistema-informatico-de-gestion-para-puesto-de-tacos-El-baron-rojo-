@@ -86,7 +86,7 @@ class interfacesProducto():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        productos = metodos_productos.Productos_acciones.obtener_productos()
+        productos = metodos_productos.Productos_acciones.mostrar_productos()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
@@ -129,7 +129,7 @@ class interfacesProducto():
             except Exception:
                 precio_text = str(precio)
             tag = 'even' if i % 2 == 0 else 'odd'
-            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], producto[2], precio_text, ''), tags=(tag,))
+            item_id = tabla.insert('', 'end', values=(i+1, producto[1], producto[2], precio_text, ''), tags=(tag,))
 
             btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
             btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
