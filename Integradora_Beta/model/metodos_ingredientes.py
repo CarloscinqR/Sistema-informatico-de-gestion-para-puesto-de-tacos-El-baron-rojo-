@@ -71,7 +71,7 @@ class Ingredientes_acciones:
 
     
     @staticmethod
-    def modificar(name, measurement_unit, id_ingredient, id_product, quantity):
+    def modificar(name, measurement_unit, id_ingredient):
         try:
             # Validate id_ingredient exists
             conexionBD.cursor.execute("SELECT id_ingredients FROM ingredients WHERE id_ingredients=%s", (id_ingredient,))
@@ -80,33 +80,6 @@ class Ingredientes_acciones:
                 messagebox.showerror("Error", msg)
                 return False, msg
 
-            # Validate product and quantity are provided
-            if id_product is None:
-                msg = "Producto es requerido."
-                messagebox.showerror("Error", msg)
-                return False, msg
-            
-            # Validate provided product id exists in products table (FK constraint)
-            try:
-                idp = int(id_product)
-            except Exception:
-                msg = "ID de producto inválido."
-                messagebox.showerror("Error", msg)
-                return False, msg
-            
-            conexionBD.cursor.execute("SELECT id_product FROM products WHERE id_product=%s", (idp,))
-            if not conexionBD.cursor.fetchone():
-                msg = "No existe product con el ID proporcionado."
-                messagebox.showerror("Error", msg)
-                return False, msg
-            
-            # Ensure quantity is numeric and provided
-            try:
-                qty_int = int(quantity) if quantity else 0
-            except Exception:
-                msg = "Cantidad inválida."
-                messagebox.showerror("Error", msg)
-                return False, msg
 
             # Update ingredient (only has: id_ingredients, name, measurement_unit)
             conexionBD.cursor.execute(
@@ -115,16 +88,12 @@ class Ingredientes_acciones:
             )
             rows_updated = conexionBD.cursor.rowcount
 
-            # Update or insert ingredients_details
-            conexionBD.cursor.execute(
-                "UPDATE ingredients_details SET id_product=%s, quntity=%s WHERE id_ingredients=%s",
-                (idp, qty_int, id_ingredient)
-            )
+
             if conexionBD.cursor.rowcount == 0:
                 # No existing detail row: insert one
                 conexionBD.cursor.execute(
                     "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
-                    (id_ingredient, idp, qty_int)
+                    (id_ingredient,)
                 )
 
             conexionBD.conexion.commit()

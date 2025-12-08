@@ -155,10 +155,15 @@ class Productos_acciones():
 
     @staticmethod
     def actualizar_ingredientes(id_producto, ingredientes):
+
         try:
             conexionBD.cursor.execute("DELETE FROM ingredients_details WHERE id_product = %s",(id_producto,))
             for id_ing, cantidad in ingredientes:
+                print(id_ing)
+                print(cantidad) 
                 conexionBD.cursor.execute("INSERT INTO ingredients_details (id_product, id_ingredients, quantity) VALUES (%s, %s, %s)",(id_producto, id_ing, cantidad))
+            print(id_ing)
+            print(cantidad)
             conexionBD.conexion.commit()
             return True
 

@@ -366,7 +366,7 @@ class interfacesIngrediente():
                 self.menu_ingrediente(modificar_ingrediente)
                 return
             # id, name, measurement_unit, quantity
-            _, name, unit, qty = sel
+            _, name, unit, = sel
         except Exception:
             messagebox.showerror("Error", "No se pudo cargar ingrediente.")
             self.menu_ingrediente(modificar_ingrediente)
@@ -384,28 +384,13 @@ class interfacesIngrediente():
         ent_unit.insert(0, unit)
         ent_unit.pack(padx=20, pady=10)
 
-        lbl_id_prod = Label(fondo2, text="Producto", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
-        lbl_id_prod.pack(padx=20, pady=10)
-        products = metodos_productos.Productos_acciones.obtener_productos() if hasattr(metodos_productos.Productos_acciones, 'obtener_productos') else []
-        prod_id_by_name = {str(p[1]): p[0] for p in products} if products else {}
-        prod_name_by_id = {p[0]: str(p[1]) for p in products} if products else {}
-        prod_names = list(prod_id_by_name.keys()) if prod_id_by_name else []
-        cb_prod = ttk.Combobox(fondo2, values=prod_names, state='readonly')
-        if prod_names:
-            cb_prod.set(prod_names[0])
-        cb_prod.pack(padx=20, pady=10)
 
-        lbl_qty = Label(fondo2, text="Cantidad", font=("Inter", 16), bg="#A6171C", fg="#F1C045")
-        lbl_qty.pack(padx=20, pady=10)
-        ent_qty = Entry(fondo2, font=("Inter", 14))
-        ent_qty.insert(0, str(qty))
-        ent_qty.pack(padx=20, pady=10)
+
 
         def on_update():
             new_name = ent_nombre.get().strip()
             new_unit = ent_unit.get().strip()
-            new_prod_name = cb_prod.get().strip()
-            new_qty = ent_qty.get().strip()
+
             
             if not new_name:
                 messagebox.showerror("Error", "El nombre es requerido.")
@@ -413,25 +398,8 @@ class interfacesIngrediente():
             if not new_unit:
                 messagebox.showerror("Error", "La unidad de medida es requerida.")
                 return
-            if not new_prod_name:
-                messagebox.showerror("Error", "El producto es requerido.")
-                return
-            if not new_qty:
-                messagebox.showerror("Error", "La cantidad es requerida.")
-                return
-            
-            new_prod = prod_id_by_name.get(new_prod_name)
-            if new_prod is None:
-                messagebox.showerror("Error", "Producto seleccionado inválido.")
-                return
-            
-            try:
-                float(new_qty)
-            except Exception:
-                messagebox.showerror("Error", "Cantidad inválida.")
-                return
 
-            res = metodos_ingredientes.Ingredientes_acciones.modificar(new_name, new_unit, id_ingredient, new_prod, new_qty)
+            res = metodos_ingredientes.Ingredientes_acciones.modificar(new_name, new_unit, id_ingredient)
             if isinstance(res, tuple):
                 ok, err = res
             else:

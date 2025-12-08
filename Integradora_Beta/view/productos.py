@@ -516,6 +516,7 @@ class interfacesProducto():
 
             ingredientes_vars.append(var)
         def on_modificar():
+            print(ingredientes_vars)#Problema aqui-----------------------
             nonlocal pid
             nuevo_nombre = nombre_entry.get().strip()
             precio_text = precio_entry.get().strip()
@@ -537,13 +538,12 @@ class interfacesProducto():
                 selected_category_mod = combobox_categoria_mod.get()
             except Exception:
                 selected_category_mod = None
-
             modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
             nuevos_ingredientes = [v.get() for v in ingredientes_vars if v.get() != 0]
+            
+            modificado2=metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
 
-            metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
-
-            if modificado:
+            if modificado and modificado2:
                 messagebox.showinfo("Éxito", "Producto modificado correctamente.")
                 self.menu_producto(modificar_producto)
             else:

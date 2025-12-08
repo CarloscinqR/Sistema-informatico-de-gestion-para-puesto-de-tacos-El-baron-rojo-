@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 01, 2025 at 02:55 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 08-12-2025 a las 15:42:25
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `bd_baron_rojo`
+-- Base de datos: `bd_baron_rojo`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `detail_order`
+-- Estructura de tabla para la tabla `detail_order`
 --
 
 CREATE TABLE `detail_order` (
@@ -37,7 +37,7 @@ CREATE TABLE `detail_order` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ingredients`
+-- Estructura de tabla para la tabla `ingredients`
 --
 
 CREATE TABLE `ingredients` (
@@ -47,33 +47,53 @@ CREATE TABLE `ingredients` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `ingredients`
+-- Volcado de datos para la tabla `ingredients`
 --
 
 INSERT INTO `ingredients` (`id_ingredients`, `name`, `measurement_unit`) VALUES
-(1, 'Tortilla de maiz', 'u'),
-(4, 'Tortilla de harina', 'u'),
-(10, 'Carne asada', 'g'),
-(11, 'Carne adobada', 'g'),
-(22, 'Queso', 'g');
+(1, 'Tortilla de harina', 'u'),
+(2, 'Tortilla de maiz', 'u'),
+(3, 'Carne asada', 'g'),
+(4, 'Carne adobada', 'g'),
+(5, 'Queso', 'g');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ingredients_details`
+-- Estructura de tabla para la tabla `ingredients_details`
 --
 
 CREATE TABLE `ingredients_details` (
   `id_ingredientsdetail` int(11) NOT NULL,
   `id_ingredients` int(11) NOT NULL,
   `id_product` int(11) NOT NULL,
-  `quntity` int(3) NOT NULL
+  `quantity` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `ingredients_details`
+--
+
+INSERT INTO `ingredients_details` (`id_ingredientsdetail`, `id_ingredients`, `id_product`, `quantity`) VALUES
+(32, 2, 1, 1),
+(33, 3, 1, 30),
+(34, 2, 2, 1),
+(35, 4, 2, 30),
+(36, 1, 3, 1),
+(37, 3, 3, 75),
+(38, 1, 4, 1),
+(39, 4, 4, 75),
+(40, 2, 5, 1),
+(41, 3, 5, 20),
+(42, 5, 5, 15),
+(43, 2, 6, 1),
+(44, 4, 6, 20),
+(45, 5, 6, 15);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `orders`
+-- Estructura de tabla para la tabla `orders`
 --
 
 CREATE TABLE `orders` (
@@ -86,7 +106,7 @@ CREATE TABLE `orders` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `products`
+-- Estructura de tabla para la tabla `products`
 --
 
 CREATE TABLE `products` (
@@ -97,25 +117,23 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `products`
+-- Volcado de datos para la tabla `products`
 --
 
 INSERT INTO `products` (`id_product`, `product_name`, `products_category`, `unit_price`) VALUES
 (1, 'Taco de asada', 'Alimentos', 20.00),
 (2, 'Taco de adobada', 'Alimentos', 20.00),
-(3, 'Volcan de asada', 'Alimentos', 25.00),
-(4, 'Volcan de adobada', 'Alimentos', 25.00),
-(5, 'Burro de asada', 'Alimentos', 65.00),
-(6, 'Burro de adobada', 'Alimentos', 65.00),
+(3, 'Burro de asada', 'Alimentos', 65.00),
+(4, 'Burro de adobada', 'Alimentos', 65.00),
+(5, 'Volcan de asada', 'Alimentos', 25.00),
+(6, 'Volcan de adobada', 'Alimentos', 25.00),
 (7, 'Gringa de asada', 'Alimentos', 80.00),
-(8, 'Gringa de adobada', 'Alimentos', 80.00),
-(9, 'El BB', 'Especiales', 140.00),
-(10, 'Alambre el baron', 'Especiales', 125.00);
+(8, 'Gringa de adobada', 'Alimentos', 80.00);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user`
+-- Estructura de tabla para la tabla `user`
 --
 
 CREATE TABLE `user` (
@@ -129,18 +147,20 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `user`
+-- Volcado de datos para la tabla `user`
 --
 
 INSERT INTO `user` (`id_user`, `username`, `password`, `creation_date`, `delete_date`, `status`, `role`) VALUES
-(1, 'admin', '123', '2025-11-14', '0000-00-00', 1, 'Administrador');
+(1, 'admin', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-11-14', '0000-00-00', 1, 'Administrador'),
+(2, 'Carlos', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-07', '0000-00-00', 1, 'Administrador'),
+(3, 'Jose', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-07', '2025-12-07', 0, 'Empleado');
 
 --
--- Indexes for dumped tables
+-- Índices para tablas volcadas
 --
 
 --
--- Indexes for table `detail_order`
+-- Indices de la tabla `detail_order`
 --
 ALTER TABLE `detail_order`
   ADD PRIMARY KEY (`id_detail_order`),
@@ -148,13 +168,13 @@ ALTER TABLE `detail_order`
   ADD KEY `id_orden` (`id_order`);
 
 --
--- Indexes for table `ingredients`
+-- Indices de la tabla `ingredients`
 --
 ALTER TABLE `ingredients`
   ADD PRIMARY KEY (`id_ingredients`);
 
 --
--- Indexes for table `ingredients_details`
+-- Indices de la tabla `ingredients_details`
 --
 ALTER TABLE `ingredients_details`
   ADD PRIMARY KEY (`id_ingredientsdetail`),
@@ -162,77 +182,77 @@ ALTER TABLE `ingredients_details`
   ADD KEY `id_product` (`id_product`);
 
 --
--- Indexes for table `orders`
+-- Indices de la tabla `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id_order`);
 
 --
--- Indexes for table `products`
+-- Indices de la tabla `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id_product`);
 
 --
--- Indexes for table `user`
+-- Indices de la tabla `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id_user`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT for table `detail_order`
+-- AUTO_INCREMENT de la tabla `detail_order`
 --
 ALTER TABLE `detail_order`
   MODIFY `id_detail_order` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `ingredients`
+-- AUTO_INCREMENT de la tabla `ingredients`
 --
 ALTER TABLE `ingredients`
-  MODIFY `id_ingredients` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id_ingredients` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT for table `ingredients_details`
+-- AUTO_INCREMENT de la tabla `ingredients_details`
 --
 ALTER TABLE `ingredients_details`
-  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
--- AUTO_INCREMENT for table `orders`
+-- AUTO_INCREMENT de la tabla `orders`
 --
 ALTER TABLE `orders`
   MODIFY `id_order` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `products`
+-- AUTO_INCREMENT de la tabla `products`
 --
 ALTER TABLE `products`
-  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `user`
+-- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- Constraints for dumped tables
+-- Restricciones para tablas volcadas
 --
 
 --
--- Constraints for table `detail_order`
+-- Filtros para la tabla `detail_order`
 --
 ALTER TABLE `detail_order`
   ADD CONSTRAINT `detail_order_ibfk_1` FOREIGN KEY (`id_order`) REFERENCES `orders` (`id_order`),
   ADD CONSTRAINT `detail_order_ibfk_2` FOREIGN KEY (`id_product`) REFERENCES `products` (`id_product`);
 
 --
--- Constraints for table `ingredients_details`
+-- Filtros para la tabla `ingredients_details`
 --
 ALTER TABLE `ingredients_details`
   ADD CONSTRAINT `ingredients_details_ibfk_2` FOREIGN KEY (`id_ingredients`) REFERENCES `ingredients` (`id_ingredients`),
