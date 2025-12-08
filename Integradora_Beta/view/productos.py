@@ -86,7 +86,7 @@ class interfacesProducto():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        productos = metodos_productos.Productos_acciones.mostrar_productos()
+        productos = metodos_productos.Productos_acciones.obtener_productos()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
@@ -129,7 +129,7 @@ class interfacesProducto():
             except Exception:
                 precio_text = str(precio)
             tag = 'even' if i % 2 == 0 else 'odd'
-            item_id = tabla.insert('', 'end', values=(i+1, producto[1], producto[2], precio_text, ''), tags=(tag,))
+            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], producto[2], precio_text, ''), tags=(tag,))
 
             btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
             btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
@@ -498,25 +498,48 @@ class interfacesProducto():
         marco = Frame(inner_mod, bg="white")
         marco.pack(padx=20, pady=10)
         columnas = 3
-        for i, (id_ing, nombre) in enumerate(ingredientes):
-            valor_inicial = id_ing if id_ing in ingredientes_actuales else 0
+        # obtener mapa id -> cantidad (vacío si no hay)
+        ingredientes_con_cant = {}
+        if pid:
+            try:
+                ingredientes_con_cant = metodos_productos.Productos_acciones.obtener_ingredientes_con_cantidad(pid)
+            except Exception:
+                ingredientes_con_cant = {}
 
+        ingredientes_vars = []
+
+        columnas = 3
+        for i, (id_ing, nombre) in enumerate(ingredientes):
+            # valor inicial para el checkbox (1..n si pertenece, 0 si no)
+            valor_inicial = id_ing if id_ing in ingredientes_actuales else 0
             var = IntVar(value=valor_inicial)
+
             chk = Checkbutton(marco,text=nombre,variable=var,onvalue=id_ing,offvalue=0,font=("Inter", 18),bg="white")
-            lbl_cantidad = Label(marco,text="Cantidad:",font=("Inter", 14),bg="white")
-            # Entry para la cantidad
+            lbl_cantidad = Label(marco, text="Cantidad:", font=("Inter", 14), bg="white")
             etr = Entry(marco, width=5, font=("Inter", 14))
+            # Si existe una cantidad guardada en BD, precargarla
+            if id_ing in ingredientes_con_cant:
+                try:
+                    etr.delete(0, "end")
+                    etr.insert(0, str(ingredientes_con_cant[id_ing]))
+                except Exception:
+                    pass
 
             fila = i // columnas
-            col_base = (i % columnas) * 3  
+            col_base = (i % columnas) * 3
 
             chk.grid(row=fila, column=col_base, padx=10, pady=5, sticky="w")
             lbl_cantidad.grid(row=fila, column=col_base + 1, padx=5, pady=5)
             etr.grid(row=fila, column=col_base + 2, padx=5, pady=5)
 
-            ingredientes_vars.append(var)
+            # guardamos en la estructura que usa el resto del código
+            ingredientes_vars.append({
+                "id": id_ing,
+                "var": var,
+                "cantidad": etr
+            })
+
         def on_modificar():
-            print(ingredientes_vars)#Problema aqui-----------------------
             nonlocal pid
             nuevo_nombre = nombre_entry.get().strip()
             precio_text = precio_entry.get().strip()
@@ -538,12 +561,13 @@ class interfacesProducto():
                 selected_category_mod = combobox_categoria_mod.get()
             except Exception:
                 selected_category_mod = None
-            modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
-            nuevos_ingredientes = [v.get() for v in ingredientes_vars if v.get() != 0]
-            
-            modificado2=metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
 
-            if modificado and modificado2:
+            modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
+            nuevos_ingredientes = [(item["id"], int(item["cantidad"].get()))
+            for item in ingredientes_vars
+            if item["var"].get() != 0]
+            metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
+            if modificado:
                 messagebox.showinfo("Éxito", "Producto modificado correctamente.")
                 self.menu_producto(modificar_producto)
             else:
