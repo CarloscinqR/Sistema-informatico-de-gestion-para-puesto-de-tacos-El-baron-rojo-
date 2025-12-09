@@ -25,22 +25,16 @@ class Productos_acciones():
     @staticmethod
     def mostrar_productos():
         try:
-            conexionBD.cursor.execute("SELECT * FROM products")
+            conexionBD.cursor.execute("SELECT * FROM products order by products_category ")
             productos = conexionBD.cursor.fetchall()
-
-            texto_productos = ""
-            for producto in productos:
-                # DB order: id_product, product_name, products_category, unit_price
-                texto_productos += f"ID: {producto[0]}, Nombre: {producto[1]}, Precio Unitario: {producto[3]}\n"
-            etiqueta_productos = Label(productos.contenedor_botones, text=texto_productos, font=("Inter", 16), bg="white", justify=LEFT)
-            etiqueta_productos.pack(padx=20, pady=10)
+            return productos
         except Exception as e:
             messagebox.showerror("Error", f"Error al obtener productos: {e}")
 
     @staticmethod
     def obtener_productos():
         try:
-            conexionBD.cursor.execute("SELECT * FROM products ")
+            conexionBD.cursor.execute("SELECT * FROM products where products_category = 'Alimentos'")
             productos = conexionBD.cursor.fetchall()
             return productos
         except Exception as e:
@@ -209,5 +203,4 @@ class Productos_acciones():
         except Exception as e:
             print("ERROR obtener_ingredientes_con_cantidad:", e)
             return {}
-
 

@@ -86,7 +86,7 @@ class interfacesProducto():
         tabla.tag_configure('even', background='#F6F0E8')
 
         # Cargar datos desde la base de datos usando el modelo
-        productos = metodos_productos.Productos_acciones.obtener_productos()
+        productos = metodos_productos.Productos_acciones.mostrar_productos()
         # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
