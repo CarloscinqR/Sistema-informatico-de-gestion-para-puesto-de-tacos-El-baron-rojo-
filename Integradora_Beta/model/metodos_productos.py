@@ -33,13 +33,16 @@ class Productos_acciones():
 
     @staticmethod
     def obtener_productos():
-        try:
-            conexionBD.cursor.execute("SELECT * FROM products where products_category = 'Alimentos'")
+       try:
+            conexionBD.reconectar()  
+
+            conexionBD.cursor.execute("SELECT * FROM products")
             productos = conexionBD.cursor.fetchall()
             return productos
+
         except Exception as e:
-            messagebox.showerror("Error", f"Error al obtener productos: {e}")
-            return []
+            print("Error al obtener productos:", e)
+            return None
         
     @staticmethod
     def obtener_especiales():
@@ -203,4 +206,5 @@ class Productos_acciones():
         except Exception as e:
             print("ERROR obtener_ingredientes_con_cantidad:", e)
             return {}
+
 
