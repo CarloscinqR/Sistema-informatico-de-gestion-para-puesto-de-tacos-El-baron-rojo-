@@ -15,317 +15,531 @@ class interfacesUsuario():
         for widget in ventana_login.winfo_children():
             widget.destroy()
 
-    def menu_usuario(self,menu_usuarios):
+    def menu_usuario(self, menu_usuarios):
         self.borrarPantalla(menu_usuarios)
-        fondo=Frame(menu_usuarios, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+
+        # -------------------------------------------
+        # Fondo general
+        # -------------------------------------------
+        fondo = Frame(menu_usuarios, bg="#F4F4F4")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # -------------------------------------------
+        # Contenedor central 85% del tamaño de la ventana
+        # -------------------------------------------
+        fondo2 = Frame(
+            fondo,
+            bg="#A6171C",
+            highlightbackground="#610E11",
+            highlightthickness=4
+        )
+        fondo2.place(relx=0.5, rely=0.5, anchor="center",
+                    relwidth=0.85, relheight=0.85)
 
-        lbl_titulo=Label(fondo2, text="Usuarios",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # -------------------------------------------
+        # TÍTULO
+        # -------------------------------------------
+        titulo_frame = Frame(fondo2, bg="#A6171C")
+        titulo_frame.place(relx=0.5, y=50, anchor="center")
 
-        contenedor_tabla=Frame(fondo2, width=2000, height=790)
-        contenedor_tabla.pack_propagate(False)
-        contenedor_tabla.pack(side=LEFT, padx=40, pady=20)
+        lbl_titulo = Label(
+            titulo_frame,
+            text="Usuarios",
+            font=("Orelega One", 52),
+            fg="white",
+            bg="#A6171C"
+        )
+        lbl_titulo.pack()
 
-        # --- Tabla de productos (Treeview) ---
+        # -------------------------------------------
+        # TARJETA DE LA TABLA
+        # -------------------------------------------
+        tabla_card = Frame(
+            fondo2,
+            bg="white",
+            highlightbackground="#C0C0C0",
+            highlightthickness=2
+        )
+        tabla_card.place(relx=0.5, rely=0.52, anchor="center",
+                        relwidth=0.90, relheight=0.70)
+
+        # -------------------------------------------
+        # Contenedor interno tabla
+        # -------------------------------------------
+        contenedor_tabla = Frame(tabla_card, bg="white")
+        contenedor_tabla.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # -------------------------------------------
+        # Treeview estilo
+        # -------------------------------------------
         style = ttk.Style()
-        style.theme_use('default')
-        style.configure('Treeview',
-                        foreground='black',
-                        rowheight=30,
-                        font=('Inter', 14))
-        style.configure('Treeview.Heading',
-                        background='#A6171C',
-                        foreground='#F1C045',
-                        font=('Orelega One', 16))
-        style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
+        style.theme_use("default")
 
-        # Agrego columna 'Acciones' para mostrar opciones sutiles por fila
-        columns = ('Id_usuario', 'Usuario','Fecha_creacion','Fecha_eliminacion', 'Rol' ,'Acciones')
-        tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='headings', selectmode='browse')
-        tabla.heading('Id_usuario', text='Id_usuario')
-        tabla.heading('Usuario', text='Usuario')
-        tabla.heading('Fecha_creacion', text='Fecha de creacion')
-        tabla.heading('Fecha_eliminacion', text='Fecha de eliminacion')
-        tabla.heading('Rol', text='Rol')
-        tabla.heading('Acciones', text='Acciones')
-        tabla.column('Id_usuario', width=120, anchor=CENTER)
-        tabla.column('Usuario', width=200, anchor=W)
-        tabla.column('Fecha_creacion', width=160, anchor=E)
-        tabla.column('Fecha_eliminacion', width=180, anchor=CENTER)
-        tabla.column('Rol', width=180, anchor=CENTER)
-        tabla.column('Acciones', width=180, anchor=CENTER)
+        style.configure(
+            "Treeview",
+            background="white",
+            foreground="black",
+            rowheight=32,
+            font=('Inter', 14),
+            fieldbackground="white"
+        )
+
+        style.configure(
+            "Treeview.Heading",
+            background="#A6171C",
+            foreground="#FFFFFF",
+            font=('Orelega One', 15),
+            borderwidth=0
+        )
+
+        # -------------------------------------------
+        # ENCABEZADO
+        # -------------------------------------------
+        columns = ('Id_usuario', 'Usuario', 'Fecha_cre', 'Fecha_el', 'Rol', 'Acciones')
+
+        header_frame = Frame(contenedor_tabla, bg="#A6171C")
+        header_frame.pack(fill='x')
+
+        header_cfg = dict(bg="#A6171C", fg="white", font=('Orelega One', 15))
+
+        Label(header_frame, text='Id_usuario', anchor='center', **header_cfg).grid(row=0, column=0, sticky='we')
+        Label(header_frame, text='Usuario', anchor='w', **header_cfg).grid(row=0, column=1, sticky='we')
+        Label(header_frame, text='Fecha_creación', anchor='center', **header_cfg).grid(row=0, column=2, sticky='we')
+        Label(header_frame, text='Fecha_eliminación', anchor='center', **header_cfg).grid(row=0, column=3, sticky='we')
+        Label(header_frame, text='Rol', anchor='center', **header_cfg).grid(row=0, column=4, sticky='we')
+        Label(header_frame, text='Acciones', anchor='center', **header_cfg).grid(row=0, column=5, sticky='we')
+
+        header_frame.columnconfigure(0, weight=1)   # ID
+        header_frame.columnconfigure(1, weight=3)   # Usuario
+        header_frame.columnconfigure(2, weight=2)   # Fecha cre
+        header_frame.columnconfigure(3, weight=2)   # Fecha elim
+        header_frame.columnconfigure(4, weight=2)   # Rol
+        header_frame.columnconfigure(5, weight=3)   # Acciones (más ancho)
+
+        # -------------------------------------------
+        # TABLA TREEVIEW
+        # -------------------------------------------
+        tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='', selectmode='browse')
+        total_width = tabla_card.winfo_width()
+        tabla.column('Id_usuario',     width=int(total_width * 0.07),  anchor=CENTER)
+        tabla.column('Usuario',        width=int(total_width * 0.21),  anchor=W)
+        tabla.column('Fecha_cre',      width=int(total_width * 0.14),  anchor=CENTER)
+        tabla.column('Fecha_el',       width=int(total_width * 0.14),  anchor=CENTER)
+        tabla.column('Rol',            width=int(total_width * 0.14),  anchor=CENTER)
+        tabla.column('Acciones',       width=int(total_width * 0.23),  anchor=CENTER) 
 
         vsb = ttk.Scrollbar(contenedor_tabla, orient="vertical")
-        # comando personalizado para reposicionar botones al hacer scroll
+
         def _vsb_command(*args):
             tabla.yview(*args)
             try:
                 reposition_buttons()
-            except Exception:
+            except:
                 pass
 
         vsb.config(command=_vsb_command)
         tabla.configure(yscrollcommand=vsb.set)
-        tabla.pack(fill=BOTH, expand=True, padx=20, pady=10)
-        vsb.pack(side=RIGHT, fill=Y, pady=10, padx=(0,20))
 
-        # Estilo de filas alternadas
+        tabla.pack(fill=BOTH, expand=True, side=LEFT)
+        vsb.pack(side=RIGHT, fill=Y)
+
         tabla.tag_configure('odd', background='#FFFFFF')
-        tabla.tag_configure('even', background='#F6F0E8')
+        tabla.tag_configure('even', background='#F8F8F8')
 
-        # Cargar datos desde la base de datos usando el modelo
         usuarios = metodos_usuarios.Usuarios_acciones.obtener_usuarios()
-        # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
+        # -------------------------------------------
+        # Función botones borrar / editar
+        # -------------------------------------------
         def on_borrar(iid, uid, uname):
-            confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el usuario?\nID: {uid}\nNombre: {uname}")
+            confirm = messagebox.askyesno(
+                "Confirmar eliminación",
+                f"¿Desea eliminar el usuario?\nID: {uid}\nNombre: {uname}"
+            )
             if not confirm:
                 return
+
             eliminado = metodos_usuarios.Usuarios_acciones.borrar(uid)
+
             if eliminado:
                 messagebox.showinfo("Éxito", "Usuario eliminado correctamente.")
                 try:
                     b_ed, b_del = _row_buttons.pop(iid, (None, None))
-                    if b_ed:
-                        try:
-                            b_ed.destroy()
-                        except Exception:
-                            pass
-                    if b_del:
-                        try:
-                            b_del.destroy()
-                        except Exception:
-                            pass
-                    try:
-                        tabla.delete(iid)
-                    except Exception:
-                        pass
-                    try:
-                        reposition_buttons()
-                    except Exception:
-                        pass
-                except Exception:
+                    if b_ed: b_ed.destroy()
+                    if b_del: b_del.destroy()
+                    tabla.delete(iid)
+                    reposition_buttons()
+                except:
                     pass
             else:
-                messagebox.showerror("Error", "No se pudo eliminar al usuario. Verifique la conexión o los datos.")
-        
-        def on_editar(iid, uid, uname, upassw,urol):
-            # Abrir la vista de modificación pre-llenada con los datos seleccionados
-            try:
-                self.modificarUsuario(menu_usuarios, (uid,uname,upassw,urol))
-            except Exception as e:
-                messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
-        
-        for i, user in enumerate(usuarios):
-            # producto es una tupla (id_prduct, prduct_name, unit_price)
-            tag = 'even' if i % 2 == 0 else 'odd'
-            # Insertar fila en la tabla (sin funciones)
-            if user[4]==None:
-                fecha_el="-----"
-            else:
-                fecha_el=user[4]
-            
-            item_id = tabla.insert('', 'end', values=(i+1, user[1], user[3], fecha_el,user[6],''), tags=(tag,))
+                messagebox.showerror("Error", "No se pudo eliminar al usuario.")
 
-            # Crear botones visibles sobre la Treeview en la columna 'Acciones'
-            # Los botones no tienen comando (no funcionales)
-            btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1], upassw=user[2],urol=user[6]: on_editar(iid, uid, uname, upassw,urol))
-            btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2,command=lambda iid=item_id, uid=user[0], uname=user[1]: on_borrar(iid, uid, uname))
+        def on_editar(iid, uid, uname, upassw, urol):
+            try:
+                self.modificarUsuario(menu_usuarios, (uid, uname, upassw, urol))
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo abrir la ventana: {e}")
+
+        # -------------------------------------------
+        # Insertar filas con botones
+        # -------------------------------------------
+        for i, user in enumerate(usuarios):
+            fecha_el = user[4] if user[4] else "-----"
+            tag = 'even' if i % 2 == 0 else 'odd'
+
+            item_id = tabla.insert(
+                '', 'end',
+                values=(i+1, user[1], user[3], fecha_el, user[6], ''),
+                tags=(tag,)
+            )
+
+            btn_editar = Button(
+                tabla,
+                text='Editar',
+                font=("Inter", 9),
+                bg="white",
+                fg="#A6171C",
+                relief="solid",
+                bd=1,
+                highlightthickness=0,
+                command=lambda iid=item_id, u=user: on_editar(iid, u[0], u[1], u[2], u[6])
+            )
+
+            btn_borrar = Button(
+                tabla,
+                text='Borrar',
+                font=("Inter", 9),
+                bg="#A6171C",
+                fg="white",
+                relief="solid",
+                bd=1,
+                highlightthickness=0,
+                command=lambda iid=item_id, u=user: on_borrar(iid, u[0], u[1])
+            )
+
             _row_buttons[item_id] = (btn_editar, btn_borrar)
 
-
-        # Forzar dibujo y posicionar los botones sobre cada celda 'Acciones'
         menu_usuarios.update_idletasks()
 
+        # -------------------------------------------
+        # Reposicionar botones dentro del Treeview
+        # -------------------------------------------
         def reposition_buttons():
             for iid, (b_ed, b_del) in _row_buttons.items():
                 try:
                     bbox = tabla.bbox(iid, column='Acciones')
-                except Exception:
+                except:
                     bbox = None
+
                 if not bbox:
-                    # ocultar si no está visible
                     b_ed.place_forget()
                     b_del.place_forget()
                     continue
-                x, y, width, height = bbox
-                # ajustar posiciones relativas dentro de la celda
-                btn_width = int(width * 0.45)
-                gap = 6
-                # colocar botones dentro del árbol usando coordenadas relativas al Treeview
-                b_ed.place(x=x + 4, y=y + 2, width=btn_width - gap, height=height - 4)
-                b_del.place(x=x + 4 + btn_width, y=y + 2, width=btn_width - gap, height=height - 4)
 
-        # Ligar reposition a eventos que mueven la vista
+                x, y, width, height = bbox
+                btn_width = int((width - 16) / 2)  # Más espacio lateral
+                b_ed.place(x=x+2, y=y+4, width=btn_width, height=height-8)
+                b_del.place(x=x+btn_width+6, y=y+4, width=btn_width, height=height-8)
+
         tabla.bind('<Configure>', lambda e: reposition_buttons())
         tabla.bind('<ButtonRelease-1>', lambda e: reposition_buttons())
-        tabla.bind('<Motion>', lambda e: None)
-        # rueda del ratón en Windows
-        tabla.bind_all('<MouseWheel>', lambda e: (reposition_buttons(), None))
+        tabla.bind_all('<MouseWheel>', lambda e: reposition_buttons())
 
-        # llamada inicial
         try:
             reposition_buttons()
-        except Exception:
+        except:
             pass
 
-        btn_agregarProducto=Button(contenedor_tabla, text="Agregar usuario", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevoUsuario(menu_usuarios), width=22)
-        btn_agregarProducto.pack(padx=20, pady=10, fill="x", side=LEFT)
+        # -------------------------------------------
+        # BOTONES INFERIORES (PEQUEÑOS)
+        # -------------------------------------------
+        botones_frame = Frame(fondo2, bg="#A6171C")
+        botones_frame.place(relx=0.5, rely=0.92, anchor="center")
 
-        btn_regresar=Button(contenedor_tabla, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(menu_usuarios), width=22)
-        btn_regresar.pack(padx=20, pady=10, fill="x", side=RIGHT)
+        btn_agregar = Button(
+            botones_frame,
+            text="Agregar usuario",
+            font=("Inter", 16),
+            fg="white",
+            bg="#A6171C",
+            relief="flat",
+            padx=24,
+            pady=6,
+            width=18,
+            command=lambda: self.nuevoUsuario(menu_usuarios)
+        )
+        btn_agregar.grid(row=0, column=0, padx=25)
 
-    def nuevoUsuario(self,nuevo_usuario):
+        btn_regresar = Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 16),
+            fg="#A6171C",
+            bg="white",
+            relief="flat",
+            padx=24,
+            pady=6,
+            width=18,
+            command=lambda: self.regresar(menu_usuarios)
+        )
+        btn_regresar.grid(row=0, column=1, padx=25)
+
+
+    def nuevoUsuario(self, nuevo_usuario):
         self.borrarPantalla(nuevo_usuario)
         nuevo_usuario.title("Nuevo usuario")
         nuevo_usuario.geometry("1920x1080")
         nuevo_usuario.state("zoomed")
 
-        fondo=Frame(nuevo_usuario, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+        # Fondo general rojo
+        fondo = Frame(nuevo_usuario, bg="#A6171C")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # Contenedor centrado blanco con borde decorativo
+        container = Frame(
+            fondo,
+            bg="white",
+            width=750,
+            height=750,
+            highlightbackground="#F1C045",
+            highlightthickness=4
+        )
+        container.place(relx=0.5, rely=0.5, anchor="center")
 
-        lbl_titulo=Label(fondo2, text="Nuevo usuario",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # Título
+        lbl_titulo = Label(
+            container,
+            text="Nuevo usuario",
+            font=("Orelega One", 42),
+            fg="#A6171C",
+            bg="white"
+        )
+        lbl_titulo.pack(pady=(40, 10))
 
-        fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True)
-        
-        lbl_nombre=Label(fondo3, text="Nombre", font=("Inter", 24), bg="white")
-        lbl_nombre.pack(padx=20, pady=10)
-        
-        nomb=StringVar()
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=nomb)
-        nombre_entry.pack(padx=20, pady=10)
+        # Marco del formulario
+        form_frame = Frame(container, bg="white")
+        form_frame.pack(pady=20)
 
-        lbl_contrasenia=Label(fondo3, text="Contraseña", font=("Inter", 24), bg="white")
-        lbl_contrasenia.pack(padx=20, pady=10)
+        # --- Nombre ---
+        Label(form_frame, text="Nombre", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        nomb = StringVar()
+        nombre_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat")
+        nombre_entry.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
-        contr=StringVar()
-        contrasenia_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr)
-        contrasenia_entry.pack(padx=20, pady=10)
+        # --- Contraseña ---
+        Label(form_frame, text="Contraseña", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        contr = StringVar()
+        contrasenia_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat", show="*")
+        contrasenia_entry.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
-        lbl_contrasenia2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
-        lbl_contrasenia2.pack(padx=20, pady=10)
-        contr2=StringVar()
-        contrasenia2_entry=Entry(fondo3, font=("Inter", 24), bg="white",textvariable=contr2)
-        contrasenia2_entry.pack(padx=20, pady=10)
+        # --- Confirmar Contraseña ---
+        Label(form_frame, text="Confirmar contraseña", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        contr2 = StringVar()
+        contrasenia2_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat", show="*")
+        contrasenia2_entry.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
-        lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
-        lbl_rol.pack(padx=20, pady=10)
-
-        roles=["Administrador","Empleado"]
-        rol_cbx=ttk.Combobox(fondo3,values=roles,font=("Inter", 24),state="readonly")
+        # --- Rol ---
+        Label(form_frame, text="Rol", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        roles = ["Administrador", "Empleado"]
+        rol_cbx = ttk.Combobox(
+            form_frame,
+            values=roles,
+            font=("Inter", 20),
+            state="readonly"
+        )
         rol_cbx.set(roles[0])
-        rol_cbx.pack()
-        
+        rol_cbx.pack(padx=40, pady=(0, 20), fill="x")
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(nuevo_usuario))
-        btn_regresar.pack(padx=20, pady=10)
-        
-        btn_agregar=Button(fondo3, text="Agregar", font=("Inter", 24), bg="#F1C045" ,command=lambda: funciones.Controladores.respuesta_sql("Agregar usuario",metodos_usuarios.Usuarios_acciones.agregar(nomb.get(),contr.get(),contr2.get(),rol_cbx.get())))
-        btn_agregar.pack(padx=20, pady=10)
+        # Marco de botones
+        botones_frame = Frame(container, bg="white")
+        botones_frame.pack(pady=25)
 
-    def modificarUsuario(self,modificar_usuario,usuario=None):
+        # Botón Regresar
+        btn_regresar = Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 20),
+            bg="#F1C045",
+            fg="black",
+            activebackground="#D9A935",
+            relief="flat",
+            width=12,
+            command=lambda: self.menu_usuario(nuevo_usuario)
+        )
+        btn_regresar.grid(row=0, column=0, padx=20)
+
+        # Botón Agregar
+        btn_agregar = Button(
+            botones_frame,
+            text="Agregar",
+            font=("Inter", 20),
+            bg="#A6171C",
+            fg="white",
+            activebackground="#8F1318",
+            relief="flat",
+            width=12,
+            command=lambda: funciones.Controladores.respuesta_sql(
+                "Agregar usuario",
+                metodos_usuarios.Usuarios_acciones.agregar(
+                    nomb.get(), contr.get(), contr2.get(), rol_cbx.get()
+                )
+            )
+        )
+        btn_agregar.grid(row=0, column=1, padx=20)
+
+
+
+    def modificarUsuario(self, modificar_usuario, usuario=None):
         self.borrarPantalla(modificar_usuario)
         modificar_usuario.title("Modificar Usuario")
         modificar_usuario.geometry("1920x1080")
         modificar_usuario.state("zoomed")
 
-        fondo=Frame(modificar_usuario, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+        # ================================
+        # 🔴 Fondo rojo global
+        # ================================
+        fondo = Frame(modificar_usuario, bg="#A6171C")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # ================================
+        # 📦 Tarjeta blanca centrada
+        # ================================
+        container = Frame(
+            fondo,
+            bg="white",
+            width=750,
+            height=780,
+            highlightbackground="#F1C045",
+            highlightthickness=4
+        )
+        container.place(relx=0.5, rely=0.5, anchor="center")
 
-        lbl_titulo=Label(fondo2, text="Modificar Usuario",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # ================================
+        # 🔤 Título
+        # ================================
+        lbl_titulo = Label(
+            container,
+            text="Modificar Usuario",
+            font=("Orelega One", 42),
+            fg="#A6171C",
+            bg="white"
+        )
+        lbl_titulo.pack(pady=(40, 15))
 
-        fondo3=Frame(fondo2, bg="white", height=180)
-        fondo3.pack(expand=True)
-
+        # ================================
+        # 📋 Obtener datos iniciales
+        # ================================
         uid = None
         initial_name = ""
-        initial_passw=""
+        initial_passw = ""
         initial_rol = ""
+
         if usuario:
             try:
                 uid = usuario[0]
                 initial_name = usuario[1]
                 initial_rol = usuario[3]
-            except Exception:
+            except:
                 uid = None
 
-        lbl_nombre=Label(fondo3, text="Nombre del usuario", font=("Inter", 24), bg="white")
-        lbl_nombre.pack(padx=20, pady=10)
-        
-        nombre_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        # ================================
+        # 🧾 Frame del formulario
+        # ================================
+        form_frame = Frame(container, bg="white")
+        form_frame.pack(pady=10)
+
+        # --- Nombre ---
+        Label(form_frame, text="Nombre", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        nombre_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat")
         nombre_entry.insert(0, initial_name)
-        nombre_entry.pack(padx=20, pady=10)
+        nombre_entry.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
-        lbl_passw=Label(fondo3, text="Contraseña", font=("Inter", 24), bg="white")
-        lbl_passw.pack(padx=20, pady=10)
-
-        passw_entry=Entry(fondo3, font=("Inter", 24), bg="white")
+        # --- Contraseña ---
+        Label(form_frame, text="Contraseña", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        passw_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat", show="*")
         passw_entry.insert(0, initial_passw)
-        passw_entry.pack(padx=20, pady=10)
+        passw_entry.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
-        lbl_passw2=Label(fondo3, text="Confirmar contraseña", font=("Inter", 24), bg="white")
-        lbl_passw2.pack(padx=20, pady=10)
-
-        passw_entry2=Entry(fondo3, font=("Inter", 24), bg="white")
+        # --- Confirmar Contraseña ---
+        Label(form_frame, text="Confirmar contraseña", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        passw_entry2 = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat", show="*")
         passw_entry2.insert(0, initial_passw)
-        passw_entry2.pack(padx=20, pady=10)
+        passw_entry2.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
-
-        lbl_rol=Label(fondo3, text="Rol", font=("Inter", 24), bg="white")
-        lbl_rol.pack(padx=20, pady=10)
-        roles=["Administrador","Empleado"]
-        rol_cbx=ttk.Combobox(fondo3,values=roles,font=("Inter", 24),state="readonly")
+        # --- Rol ---
+        Label(form_frame, text="Rol", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
+        roles = ["Administrador", "Empleado"]
+        rol_cbx = ttk.Combobox(
+            form_frame,
+            values=roles,
+            font=("Inter", 20),
+            state="readonly"
+        )
         rol_cbx.set(initial_rol)
-        rol_cbx.pack()
+        rol_cbx.pack(padx=40, pady=(0, 25), fill="x")
 
-
-
+        # ================================
+        # 🔧 Función para modificar
+        # ================================
         def on_modificar():
             nonlocal uid
             nuevo_nombre = nombre_entry.get().strip()
             passw_text = passw_entry.get().strip()
-            passw2_text=passw_entry2.get().strip()
-            rol_text=rol_cbx.get().strip()
+            passw2_text = passw_entry2.get().strip()
+            rol_text = rol_cbx.get().strip()
+
             if not nuevo_nombre:
                 messagebox.showerror("Error", "El nombre no puede estar vacío.")
                 return
             if uid is None:
                 messagebox.showerror("Error", "Id del usuario desconocido. No se puede modificar.")
                 return
-            # Pedir contraseña antes de modificar
 
-            modificado = metodos_usuarios.Usuarios_acciones.modificar_usuario(nuevo_nombre, passw_text,passw2_text,rol_text,uid)
+            modificado = metodos_usuarios.Usuarios_acciones.modificar_usuario(
+                nuevo_nombre, passw_text, passw2_text, rol_text, uid
+            )
+
             if modificado:
                 messagebox.showinfo("Éxito", "Usuario modificado correctamente.")
                 self.menu_usuario(modificar_usuario)
             else:
-                messagebox.showerror("Error", "No se pudo modificar al usuario. Verifique la conexión o los datos.")
+                messagebox.showerror("Error", "No se pudo modificar al usuario.")
 
-        btn_agregar=Button(fondo3, text="Modificar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
-        btn_agregar.pack(padx=20, pady=10)
+        # ================================
+        # 🎛 Botones Inferiores
+        # ================================
+        botones_frame = Frame(container, bg="white")
+        botones_frame.pack(pady=25)
 
-        btn_regresar=Button(fondo3, text="Regresar", font=("Inter", 24), bg="#F1C045", command=lambda: self.menu_usuario(modificar_usuario))
-        btn_regresar.pack(padx=20, pady=10)
+        # Botón Modificar
+        btn_modificar = Button(
+            botones_frame,
+            text="Modificar",
+            font=("Inter", 20),
+            bg="#A6171C",
+            fg="white",
+            activebackground="#8F1318",
+            relief="flat",
+            width=12,
+            command=on_modificar
+        )
+        btn_modificar.grid(row=0, column=0, padx=20)
+
+        # Botón Regresar
+        btn_regresar = Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 20),
+            bg="#F1C045",
+            fg="black",
+            activebackground="#D9A935",
+            relief="flat",
+            width=12,
+            command=lambda: self.menu_usuario(modificar_usuario)
+        )
+        btn_regresar.grid(row=0, column=1, padx=20)
+
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)

@@ -86,15 +86,8 @@ class Ingredientes_acciones:
                 "UPDATE ingredients SET name=%s, measurement_unit=%s WHERE id_ingredients=%s",
                 (name, measurement_unit, id_ingredient)
             )
-            rows_updated = conexionBD.cursor.rowcount
 
 
-            if conexionBD.cursor.rowcount == 0:
-                # No existing detail row: insert one
-                conexionBD.cursor.execute(
-                    "INSERT INTO ingredients_details (id_ingredients, id_product, quntity) VALUES (%s, %s, %s)",
-                    (id_ingredient,)
-                )
 
             conexionBD.conexion.commit()
             return True, None

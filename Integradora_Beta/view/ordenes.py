@@ -17,178 +17,337 @@ class interfacesOrdenes():
         for widget in ventana_login.winfo_children():
             widget.destroy()
 
-    def menu_ordenes(self,ventana_ordenes):
+    def menu_ordenes(self, ventana_ordenes):
         self.borrarPantalla(ventana_ordenes)
-        fondo=Frame(ventana_ordenes, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+
+        # -------------------------------
+        # Fondo general gris claro
+        # -------------------------------
+        fondo = Frame(ventana_ordenes, bg="#F4F4F4")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # -------------------------------
+        # Contenedor rojo centrado
+        # -------------------------------
+        fondo2 = Frame(
+            fondo,
+            bg="#A6171C",
+            highlightbackground="#610E11",
+            highlightthickness=4
+        )
+        fondo2.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.85, relheight=0.85)
 
-        lbl_titulo=Label(fondo2, text="Ordenes",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # -------------------------------
+        # Título
+        # -------------------------------
+        titulo_frame = Frame(fondo2, bg="#A6171C")
+        titulo_frame.place(relx=0.5, y=50, anchor="center")
 
-        contenedor_tabla=Frame(fondo2, width=2000, height=790)
-        contenedor_tabla.pack_propagate(False)
-        contenedor_tabla.pack(side=LEFT, padx=40, pady=20)
+        lbl_titulo = Label(
+            titulo_frame,
+            text="Órdenes",
+            font=("Orelega One", 52),
+            fg="white",
+            bg="#A6171C"
+        )
+        lbl_titulo.pack()
 
-        # --- Tabla de Ordens (Treeview) ---
+        # -------------------------------
+        # Tarjeta blanca (contenedor tabla)
+        # -------------------------------
+        tabla_card = Frame(
+            fondo2,
+            bg="white",
+            highlightbackground="#C0C0C0",
+            highlightthickness=2
+        )
+        tabla_card.place(relx=0.5, rely=0.52, anchor="center",
+                        relwidth=0.90, relheight=0.70)
+
+        contenedor_tabla = Frame(tabla_card, bg="white")
+        contenedor_tabla.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # -------------------------------
+        # Estilo Treeview (idéntico a ingredientes)
+        # -------------------------------
         style = ttk.Style()
-        style.theme_use('default')
-        style.configure('Treeview',
-                        foreground='black',
-                        rowheight=30,
-                        font=('Inter', 14))
-        style.configure('Treeview.Heading',
-                        background='#A6171C',
-                        foreground='#F1C045',
-                        font=('Orelega One', 16))
-        style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
+        style.theme_use("default")
 
+        style.configure(
+            "Treeview",
+            background="white",
+            foreground="black",
+            rowheight=32,
+            font=('Inter', 14),
+            fieldbackground="white"
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#A6171C",
+            foreground="#FFFFFF",
+            font=('Orelega One', 15),
+            borderwidth=0
+        )
+        style.map("Treeview", background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
+
+        # -------------------------------
+        # Encabezado personalizado
+        # -------------------------------
         columns = ('N_orden', 'Cliente', 'Total')
-        tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='headings', selectmode='browse')
-        tabla.heading('N_orden', text='N. orden')
-        tabla.heading('Cliente', text='Cliente')
-        tabla.heading('Total', text='Total')
-        tabla.column('N_orden', width=120, anchor=CENTER)
-        tabla.column('Cliente', width=300, anchor=W)
-        tabla.column('Total', width=200, anchor=CENTER)
 
-        vsb = ttk.Scrollbar(contenedor_tabla, orient="vertical")
-        vsb.config(command=tabla.yview)
+        header_frame = Frame(contenedor_tabla, bg="#A6171C")
+        header_frame.pack(fill='x')
+
+        header_cfg = dict(bg="#A6171C", fg="white", font=('Orelega One', 15))
+
+        Label(header_frame, text='No.', anchor='center', **header_cfg).grid(row=0, column=0, sticky='we')
+        Label(header_frame, text='Cliente', anchor='w', **header_cfg).grid(row=0, column=1, sticky='we')
+        Label(header_frame, text='Total', anchor='center', **header_cfg).grid(row=0, column=2, sticky='we')
+
+        # Proporciones igual estilo ingredientes
+        header_frame.columnconfigure(0, weight=10)
+        header_frame.columnconfigure(1, weight=55)
+        header_frame.columnconfigure(2, weight=25)
+
+        # -------------------------------
+        # Treeview como cuerpo
+        # -------------------------------
+        tabla = ttk.Treeview(
+            contenedor_tabla,
+            columns=columns,
+            show='',
+            selectmode='browse'
+        )
+
+        tabla.update_idletasks()
+        total_width = tabla_card.winfo_width() or 1500
+
+        tabla.column('N_orden', width=int(total_width * 0.10), anchor=CENTER)
+        tabla.column('Cliente', width=int(total_width * 0.55), anchor=W)
+        tabla.column('Total', width=int(total_width * 0.25), anchor=CENTER)
+
+        vsb = ttk.Scrollbar(contenedor_tabla, orient="vertical", command=tabla.yview)
         tabla.configure(yscrollcommand=vsb.set)
-        tabla.pack(fill=BOTH, expand=True, padx=20, pady=10)
-        vsb.pack(side=RIGHT, fill=Y, pady=10, padx=(0,20))
 
-        # Estilo de filas alternadas
+        tabla.pack(fill=BOTH, expand=True, side=LEFT)
+        vsb.pack(side=RIGHT, fill=Y)
+
         tabla.tag_configure('odd', background='#FFFFFF')
-        tabla.tag_configure('even', background='#F6F0E8')
+        tabla.tag_configure('even', background='#F8F8F8')
 
-        # Cargar datos desde la base de datos usando el modelo - Solo órdenes del día actual
+        # -------------------------------
+        # Cargar datos
+        # -------------------------------
         todas_ordenes = metodos_ordenes.Ordenes_acciones.obtener_ordenes()
         hoy = datetime.now().date()
         ordenes_hoy = []
-        
-        for orden in todas_ordenes:
-            try:
-                # orden[1] es la fecha (date)
-                fecha_orden = orden[1] if isinstance(orden[1], str) else str(orden[1])
-                # Convertir a date para comparación
-                if isinstance(orden[1], str):
-                    fecha_obj = datetime.strptime(fecha_orden, '%Y-%m-%d').date()
-                else:
-                    fecha_obj = orden[1]
-                
-                if fecha_obj == hoy:
-                    ordenes_hoy.append(orden)
-            except Exception:
-                pass
-        
-        # contenedor para guardar referencias a botones por fila
-        _row_buttons = {}
 
-        # guardar mapa de ordenes por id para facilitar edición
-        self._orders_data = {}
-        for contador, orden in enumerate(ordenes_hoy, 1):
-            # orden es una tupla (id_order, date, total, costumer_name)
-            total = orden[2]
-            cliente = orden[3]
+        for o in todas_ordenes:
             try:
-                total_text = f"${float(total):.2f} MXN"
-            except Exception:
-                total_text = str(total)
-            tag = 'even' if contador % 2 == 0 else 'odd'
-            # Insertar fila en la tabla con: N. orden, Cliente, Total
-            id_order = orden[0]
-            tabla.insert('', 'end', values=(contador, cliente, total_text), tags=(tag,), iid=str(id_order))
-            # guardar para edición
+                fecha = o[1]
+                fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date() if isinstance(fecha, str) else fecha
+                if fecha_obj == hoy:
+                    ordenes_hoy.append(o)
+            except:
+                pass
+
+        self._orders_data = {}
+
+        for i, orden in enumerate(ordenes_hoy, 1):
+            id_order, fecha, total, cliente = orden
+            tag = 'even' if i % 2 == 0 else 'odd'
+
+            try:
+                total_txt = f"${float(total):.2f} MXN"
+            except:
+                total_txt = str(total)
+
+            tabla.insert('', 'end', values=(i, cliente, total_txt), tags=(tag,), iid=str(id_order))
+
             self._orders_data[str(id_order)] = orden
 
-        # Forzar dibujo
-        ventana_ordenes.update_idletasks()
+        # -------------------------------
+        # Botones inferiores estilo ingredientes
+        # -------------------------------
+        botones_frame = Frame(fondo2, bg="#A6171C")
+        botones_frame.place(relx=0.5, rely=0.92, anchor="center")
 
-        # Frame para los botones
-        frame_botones = Frame(contenedor_tabla, bg="#D6D0C5")
-        frame_botones.pack(padx=20, pady=10, fill="x")
+        def _btn(texto, comando):
+            return Button(
+                botones_frame,
+                text=texto,
+                font=("Inter", 16),
+                fg="white",
+                bg="#A6171C",
+                relief="flat",
+                padx=16,
+                pady=6,
+                width=14,   # <<< REDUCIDO PARA QUE QUEPA
+                command=comando
+            )
 
-        btn_agregarOrden=Button(frame_botones, text="Agregar orden", font=("Inter", 18), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevaOrden(ventana_ordenes))
-        btn_agregarOrden.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
+        _btn("Agregar orden", lambda: self.nuevaOrden(ventana_ordenes)).grid(row=0, column=0, padx=12)
+        _btn("Modificar orden", lambda: self.editarOrden(ventana_ordenes, tabla)).grid(row=0, column=1, padx=12)
+        _btn("Eliminar orden", lambda: self.eliminarOrden(ventana_ordenes, tabla)).grid(row=0, column=2, padx=12)
+        _btn("Detalladas", lambda: self.ordenes_detalladas(ventana_ordenes)).grid(row=0, column=3, padx=12)
 
-        btn_modificarOrden=Button(frame_botones, text="Modificar orden", font=("Inter", 18), fg="#A6171C", bg="#F1C045", command=lambda: self.editarOrden(ventana_ordenes, tabla))
-        btn_modificarOrden.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-
-        btn_eliminarOrden=Button(frame_botones, text="Eliminar orden", font=("Inter", 18), fg="#A6171C", bg="#F1C045", command=lambda: self.eliminarOrden(ventana_ordenes, tabla))
-        btn_eliminarOrden.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
-
-        btn_verDetalladas=Button(frame_botones, text="Ver ordenes detalladas", font=("Inter", 18), fg="#A6171C", bg="#F1C045", command=lambda: self.ordenes_detalladas(ventana_ordenes))
-        btn_verDetalladas.grid(row=0, column=3, padx=5, pady=5, sticky="ew")
-
-        btn_regresar=Button(frame_botones, text="Regresar", font=("Inter", 18), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(ventana_ordenes))
-        btn_regresar.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
-
-        # Configurar pesos iguales para todas las columnas
-        for i in range(5):
-            frame_botones.grid_columnconfigure(i, weight=1)
-    
+        Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 16),
+            fg="#A6171C",
+            bg="white",
+            relief="flat",
+            padx=16,
+            pady=6,
+            width=14,   # <<< MISMO ANCHO REDUCIDO
+            command=lambda: self.regresar(ventana_ordenes)
+        ).grid(row=0, column=4, padx=12)
+  
     def nuevaOrden(self,nueva_orden):
         self.borrarPantalla(nueva_orden)
         nueva_orden.title("Nueva orden")
         nueva_orden.geometry("1920x1080")
         nueva_orden.state("zoomed")
+        nueva_orden.config(bg="#FFFFFF")
 
-        fondo=Frame(nueva_orden, bg="#D6D0C5")
+        # ===== FONDO GENERAL =====
+        fondo = Frame(nueva_orden, bg="#FFFFFF")
         fondo.pack_propagate(False)
         fondo.pack(fill="both", expand=True)
 
-        header=Frame(fondo, bg="#A6171C", height=180)
+        # ===== HEADER =====
+        header = Frame(fondo, bg="#A6171C", height=170)
         header.pack(side=TOP, fill=X)
 
-        btn_regresar=Button(header, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.menu_ordenes(nueva_orden))
-        btn_regresar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
-        
-        btn_alimentos=Button(header, text="Alimentos", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesAlimentos(contenedor_botones_Ordens,self.pedido_widget))
-        btn_alimentos.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
-        
-        btn_especiales=Button(header, text="Especiales", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesEspeciales(contenedor_botones_Ordens,self.pedido_widget))
-        btn_especiales.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
+        # ===== NUEVO ESTILO DE BOTONES HEADER =====
+        estilo_btn_header = {
+            "font": ("Inter", 26, "bold"),
+            "fg": "white",
+            "bg": "#C4373D",               # 🔴 nuevo color
+            "activebackground": "#A32E33",
+            "activeforeground": "white",
+            "bd": 0,
+            "relief": "flat",
+            "cursor": "hand2",
+            "width": 12,                   # 🔥 más grandes y proporcionados
+            "height": 2,
+        }
 
-        btn_bebidas=Button(header, text="Bebidas", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda:self.botonesBebidas(contenedor_botones_Ordens,self.pedido_widget))
-        btn_bebidas.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
-        
-        btn_confirmar=Button(header, text="Confirmar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.confirmar_pedido())
-        btn_confirmar.pack(padx=20, pady=10, fill="x", side=LEFT, expand=True)
+        # ---- Botón Regresar
+        btn_regresar = Button(
+            header,
+            text="Regresar",
+            command=lambda: self.menu_ordenes(nueva_orden),
+            **estilo_btn_header
+        )
+        btn_regresar.pack(padx=25, pady=25, side=LEFT)
 
-        contenedor_botones_Ordens=Frame(fondo, bg="#D6D0C5")
+        # ---- Botón Alimentos
+        btn_alimentos = Button(
+            header,
+            text="Alimentos",
+            command=lambda: self.botonesAlimentos(contenedor_botones_Ordens, self.pedido_widget),
+            **estilo_btn_header
+        )
+        btn_alimentos.pack(padx=25, pady=25, side=LEFT, expand=True)
+
+        # ---- Botón Especiales
+        btn_especiales = Button(
+            header,
+            text="Especiales",
+            command=lambda: self.botonesEspeciales(contenedor_botones_Ordens, self.pedido_widget),
+            **estilo_btn_header
+        )
+        btn_especiales.pack(padx=25, pady=25, side=LEFT, expand=True)
+
+        # ---- Botón Bebidas
+        btn_bebidas = Button(
+            header,
+            text="Bebidas",
+            command=lambda: self.botonesBebidas(contenedor_botones_Ordens, self.pedido_widget),
+            **estilo_btn_header
+        )
+        btn_bebidas.pack(padx=25, pady=25, side=LEFT, expand=True)
+
+        # ---- Botón Confirmar
+        btn_confirmar = Button(
+            header,
+            text="Confirmar",
+            command=lambda: self.confirmar_pedido(),
+            **estilo_btn_header
+        )
+        btn_confirmar.pack(padx=25, pady=25, side=LEFT, expand=True)
+
+        # ===== CONTENEDOR PRODUCTOS =====
+        contenedor_botones_Ordens = Frame(fondo, bg="#D6D0C5")
         contenedor_botones_Ordens.pack(pady=10, padx=10, fill="both", expand=True, side=LEFT)
 
-        #Falta que funcione el registro de ordenes
-        contenedor_orden=Frame(fondo,bg="#EAEAE9",width=300)
+        # ===== PANEL DE ORDEN =====
+        contenedor_orden = Frame(
+            fondo,
+            bg="#EAEAE9",
+            width=350,
+            highlightbackground="#A6171C",
+            highlightthickness=3
+        )
         contenedor_orden.pack_propagate(False)
         contenedor_orden.pack(pady=10, padx=10, fill="y", side=RIGHT)
 
-        titulo_orden=Label(contenedor_orden, bg="#EAEAE9", font=46, text="Orden:")
-        titulo_orden.pack(pady=5)
-        nombre_comprador=Label(contenedor_orden, bg="#EAEAE9", font=5, text="Nombre del Cliente:")
-        nombre_comprador.pack(pady=5)
-        self.nombre_entry=Entry(contenedor_orden, bg="#EAEAE9")
-        self.nombre_entry.pack(fill="y", padx=5, pady=5)
-        # Pedido (no editable por el empleado; se actualiza desde los botones)
-        self.pedido_widget=Text(contenedor_orden, background="white",pady=10, font=("Inter", 14))
-        # deshabilitar edición directa
+        Label(
+            contenedor_orden,
+            bg="#EAEAE9",
+            fg="#A6171C",
+            font=("Inter", 22, "bold"),
+            text="Orden"
+        ).pack(pady=10)
+
+        Label(
+            contenedor_orden,
+            bg="#EAEAE9",
+            font=("Inter", 14),
+            text="Nombre del Cliente:"
+        ).pack(pady=5)
+
+        self.nombre_entry = Entry(
+            contenedor_orden,
+            bg="white",
+            fg="#333",
+            font=("Inter", 14),
+            relief="flat"
+        )
+        self.nombre_entry.pack(fill="x", padx=10, pady=5)
+
+        # Pedido (bloqueado)
+        self.pedido_widget = Text(
+            contenedor_orden,
+            background="white",
+            pady=10,
+            font=("Inter", 14),
+            relief="flat",
+        )
         try:
             self.pedido_widget.config(state=DISABLED)
         except Exception:
             pass
-        self.pedido_widget.pack(fill=BOTH, expand=True)
-        # Label para mostrar el total en tiempo real
-        self.lbl_total_pedido = Label(contenedor_orden, text="Total: $0.00", font=("Inter", 14, 'bold'), bg="#EAEAE9", fg="#A6171C")
-        self.lbl_total_pedido.pack(pady=6)
-        # estructura interna para llevar cantidades por id de Orden
+
+        self.pedido_widget.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+        # Total
+        self.lbl_total_pedido = Label(
+            contenedor_orden,
+            text="Total: $0.00",
+            font=("Inter", 18, 'bold'),
+            bg="#EAEAE9",
+            fg="#A6171C"
+        )
+        self.lbl_total_pedido.pack(pady=10)
+
+        # Lógica intacta
         self._order_items = {}
-        # indicador de edición: None => crear nueva, int => editar orden existente
         self._editing_order_id = None
+
+
 
     def editarOrden(self, ventana, tabla):
         """Abre la pantalla de nueva orden pero cargando los datos de la orden seleccionada para editarla."""
@@ -257,6 +416,7 @@ class interfacesOrdenes():
 
     def botonesAlimentos(self,contenedor_botones_Ordens,pedido):
             self.borrarPantalla(contenedor_botones_Ordens)
+            contenedor_botones_Ordens.config(bg="#FFFFFF")
             Ordens=metodos_productos.Productos_acciones.obtener_productos()
             maximo=3
             for c in range(maximo):
@@ -268,11 +428,29 @@ class interfacesOrdenes():
                 fila=i//maximo
                 columna=i%maximo
                 # al presionar, agregar Orden al pedido (maneja cantidades y formato)
-                boton=Button(contenedor_botones_Ordens, text=f"{Orden[1]}", relief="solid", font=("Inter", 22), command=lambda p=Orden: self._add_to_pedido(pedido, p))
+                boton=Button(contenedor_botones_Ordens, text=f"{Orden[1]}",     
+                            font=("Inter", 22, "bold"),
+                            fg="white",
+                            bg="#A6171C",
+                            activebackground="#8F1318",
+                            activeforeground="white",
+                            relief="flat",
+                            bd=0,
+                            cursor="hand2",
+                            command=lambda p=Orden: self._add_to_pedido(pedido, p))
+                def on_enter(e, b=boton):
+                    b.configure(bg="#8F1318")
+
+                def on_leave(e, b=boton):
+                    b.configure(bg="#A6171C")
+
+                boton.bind("<Enter>", on_enter)
+                boton.bind("<Leave>", on_leave)
                 boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
 
     def botonesEspeciales(self,contenedor_botones_Ordens,pedido):
             self.borrarPantalla(contenedor_botones_Ordens)
+            contenedor_botones_Ordens.config(bg="#FFFFFF")
             Ordens=metodos_productos.Productos_acciones.obtener_especiales()
             maximo=3
             for c in range(maximo):
@@ -284,11 +462,29 @@ class interfacesOrdenes():
             for i,Orden in enumerate(Ordens):
                 fila=i//maximo
                 columna=i%maximo
-                boton=Button(contenedor_botones_Ordens, text=f"{Orden[1]}", relief="solid", font=("Inter", 22), command=lambda e=Orden: self._add_to_pedido(pedido, e))
+                boton=Button(contenedor_botones_Ordens, text=f"{Orden[1]}", 
+                            fg="white",
+                            font=("Inter", 22, "bold"),
+                            bg="#A6171C",
+                            activebackground="#8F1318",
+                            activeforeground="white",
+                            relief="flat",
+                            bd=0,
+                            cursor="hand2",
+                            command=lambda e=Orden: self._add_to_pedido(pedido, e))
+                def on_enter(e, b=boton):
+                    b.configure(bg="#8F1318")
+
+                def on_leave(e, b=boton):
+                    b.configure(bg="#A6171C")
+
+                boton.bind("<Enter>", on_enter)
+                boton.bind("<Leave>", on_leave)
                 boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
 
     def botonesBebidas(self,contenedor_botones_Ordens,pedido):
             self.borrarPantalla(contenedor_botones_Ordens)
+            contenedor_botones_Ordens.config(bg="#FFFFFF")
             Ordens=metodos_productos.Productos_acciones.obtener_bebidas()
             maximo=3
             for c in range(maximo):
@@ -300,7 +496,24 @@ class interfacesOrdenes():
             for i,Orden in enumerate(Ordens):
                 fila=i//maximo
                 columna=i%maximo
-                boton=Button(contenedor_botones_Ordens, text=f"{Orden[1]}", relief="solid", font=("Inter", 22), command=lambda b=Orden: self._add_to_pedido(pedido, b))
+                boton=Button(contenedor_botones_Ordens, text=f"{Orden[1]}",
+                            fg="white",
+                            font=("Inter", 22, "bold"),
+                            bg="#A6171C",
+                            activebackground="#8F1318",
+                            activeforeground="white",
+                            relief="flat",
+                            bd=0,
+                            cursor="hand2",
+                            command=lambda b=Orden: self._add_to_pedido(pedido, b))
+                def on_enter(e, b=boton):
+                    b.configure(bg="#8F1318")
+
+                def on_leave(e, b=boton):
+                    b.configure(bg="#A6171C")
+
+                boton.bind("<Enter>", on_enter)
+                boton.bind("<Leave>", on_leave)
                 boton.grid(row=fila,column=columna, pady=5, padx=5, sticky="NSEW")
 
     def _add_to_pedido(self, pedido, Orden):
@@ -427,211 +640,291 @@ class interfacesOrdenes():
         ventana_ordenes.title("Órdenes Detalladas")
         ventana_ordenes.geometry("1920x1080")
         ventana_ordenes.state("zoomed")
-        
-        # Frame principal con grid
-        fondo = Frame(ventana_ordenes, bg="#D6D0C5")
+
+        # -------------------------------------------------------------
+        # FONDO GENERAL (gris claro)
+        # -------------------------------------------------------------
+        fondo = Frame(ventana_ordenes, bg="#F4F4F4")
         fondo.pack(fill="both", expand=True)
-        
-        # Header con selector de fecha
-        header = Frame(fondo, bg="#A6171C", height=120)
-        header.pack(side=TOP, fill=X, padx=50, pady=10)
-        
-        titulo = Label(header, text="Órdenes Detalladas", font=("Orelega One", 36), fg="#F1C045", bg="#A6171C")
-        titulo.pack(pady=5)
-        
-        # Selector de fecha
-        frame_fecha = Frame(header, bg="#A6171C")
-        frame_fecha.pack(pady=5)
-        
-        lbl_fecha = Label(frame_fecha, text="Seleccionar fecha:", font=("Inter", 14), fg="#F1C045", bg="#A6171C")
-        lbl_fecha.pack(side=LEFT, padx=10)
-        
-        # Spinbox para año
-        lbl_ano = Label(frame_fecha, text="Año:", font=("Inter", 12), fg="#F1C045", bg="#A6171C")
-        lbl_ano.pack(side=LEFT, padx=5)
+
+        # -------------------------------------------------------------
+        # CONTENEDOR ROJO PRINCIPAL (ESTILO menu_ordenes)
+        # -------------------------------------------------------------
+        fondo_rojo = Frame(
+            fondo,
+            bg="#A6171C",
+            highlightbackground="#610E11",
+            highlightthickness=4
+        )
+        fondo_rojo.place(relx=0.5, rely=0.5, anchor="center",
+                        relwidth=0.88, relheight=0.88)
+
+        # -------------------------------------------------------------
+        # TÍTULO
+        # -------------------------------------------------------------
+        titulo_frame = Frame(fondo_rojo, bg="#A6171C")
+        titulo_frame.place(relx=0.5, rely=0.08, anchor="center")
+
+        titulo = Label(
+            titulo_frame,
+            text="Órdenes Detalladas",
+            font=("Orelega One", 48),
+            fg="white",
+            bg="#A6171C"
+        )
+        titulo.pack()
+
+        # -------------------------------------------------------------
+        # HEADER FECHA + BOTÓN BUSCAR (alineado estilo menú)
+        # -------------------------------------------------------------
+        header = Frame(fondo_rojo, bg="#A6171C")
+        header.place(relx=0.5, rely=0.18, anchor="center")
+
+        lbl_fecha = Label(header, text="Seleccionar fecha:",
+                        font=("Inter", 18), fg="white", bg="#A6171C")
+        lbl_fecha.grid(row=0, column=0, padx=10)
+
+        # Año
         ano_actual = datetime.now().year
-        spinbox_ano = Spinbox(frame_fecha, from_=ano_actual-5, to=ano_actual+5, width=5, font=("Inter", 12), justify=CENTER)
+        lbl_ano = Label(header, text="Año:", font=("Inter", 14),
+                        fg="white", bg="#A6171C")
+        lbl_ano.grid(row=0, column=1, padx=5)
+        spinbox_ano = Spinbox(header, from_=ano_actual-5, to=ano_actual+5,
+                            width=5, font=("Inter", 14), justify=CENTER)
         spinbox_ano.delete(0, END)
         spinbox_ano.insert(0, str(ano_actual))
-        spinbox_ano.pack(side=LEFT, padx=5)
-        
-        # Spinbox para mes
-        lbl_mes = Label(frame_fecha, text="Mes:", font=("Inter", 12), fg="#F1C045", bg="#A6171C")
-        lbl_mes.pack(side=LEFT, padx=5)
+        spinbox_ano.grid(row=0, column=2, padx=5)
+
+        # Mes
         mes_actual = datetime.now().month
-        spinbox_mes = Spinbox(frame_fecha, from_=1, to=12, width=3, font=("Inter", 12), justify=CENTER)
+        lbl_mes = Label(header, text="Mes:", font=("Inter", 14),
+                        fg="white", bg="#A6171C")
+        lbl_mes.grid(row=0, column=3, padx=5)
+        spinbox_mes = Spinbox(header, from_=1, to=12, width=3,
+                            font=("Inter", 14), justify=CENTER)
         spinbox_mes.delete(0, END)
         spinbox_mes.insert(0, str(mes_actual))
-        spinbox_mes.pack(side=LEFT, padx=5)
-        
-        # Spinbox para día
-        lbl_dia = Label(frame_fecha, text="Día:", font=("Inter", 12), fg="#F1C045", bg="#A6171C")
-        lbl_dia.pack(side=LEFT, padx=5)
+        spinbox_mes.grid(row=0, column=4, padx=5)
+
+        # Día
         dia_actual = datetime.now().day
-        spinbox_dia = Spinbox(frame_fecha, from_=1, to=31, width=3, font=("Inter", 12), justify=CENTER)
+        lbl_dia = Label(header, text="Día:", font=("Inter", 14),
+                        fg="white", bg="#A6171C")
+        lbl_dia.grid(row=0, column=5, padx=5)
+        spinbox_dia = Spinbox(header, from_=1, to=31, width=3,
+                            font=("Inter", 14), justify=CENTER)
         spinbox_dia.delete(0, END)
         spinbox_dia.insert(0, str(dia_actual))
-        spinbox_dia.pack(side=LEFT, padx=5)
-        
-        # Frame contenedor principal con dos columnas
-        contenedor_principal = Frame(fondo, bg="#D6D0C5")
-        contenedor_principal.pack(pady=10, padx=50, fill="both", expand=True)
-        
-        # ========== TABLA DE ÓRDENES (IZQUIERDA) ==========
-        frame_ordenes_titulo = Frame(contenedor_principal, bg="#D6D0C5")
-        frame_ordenes_titulo.pack(side=LEFT, fill="x", expand=False, padx=(0, 10))
-        
-        lbl_ordenes = Label(frame_ordenes_titulo, text="Órdenes del día:", font=("Inter", 16), fg="#A6171C", bg="#D6D0C5")
-        lbl_ordenes.pack()
-        
-        # Tabla de órdenes
+        spinbox_dia.grid(row=0, column=6, padx=5)
+
+        # BOTÓN BUSCAR (estilo menú)
+        btn_buscar = Button(
+            header, text="Buscar", font=("Inter", 14),
+            fg="#A6171C",
+            bg="white",
+            relief="flat",
+            padx=10,
+            pady=4,
+            width=10,
+            command=lambda: cargar_ordenes_por_fecha()
+        )
+        btn_buscar.grid(row=0, column=7, padx=12)
+
+        # -------------------------------------------------------------
+        # TARJETA BLANCA PARA AMBAS TABLAS
+        # -------------------------------------------------------------
+        card_tablas = Frame(
+            fondo_rojo,
+            bg="white",
+            highlightbackground="#C0C0C0",
+            highlightthickness=2
+        )
+        card_tablas.place(relx=0.5, rely=0.59, anchor="center",
+                        relwidth=0.93, relheight=0.68)
+
+        # Contenedor interior
+        cont_tablas = Frame(card_tablas, bg="white")
+        cont_tablas.pack(fill="both", expand=True, padx=25, pady=25)
+
+        # -------------------------------------------------------------
+        # TREEVIEW ESTILO
+        # -------------------------------------------------------------
         style = ttk.Style()
         style.theme_use('default')
-        style.configure('Treeview', foreground='black', rowheight=25, font=('Inter', 12))
-        style.configure('Treeview.Heading', background='#A6171C', foreground='#F1C045', font=('Orelega One', 13))
-        style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
-        
+        style.configure('Treeview', foreground='black', rowheight=26, font=('Inter', 13))
+        style.configure('Treeview.Heading', background='#A6171C',
+                        foreground='white', font=('Orelega One', 14))
+        style.map('Treeview', background=[('selected', '#F1C045')],
+                foreground=[('selected', 'black')])
+
+        # -------------------------------------------------------------
+        # TABLA IZQUIERDA (40%)
+        # -------------------------------------------------------------
+        frame_ordenes = Frame(cont_tablas, bg="white")
+        frame_ordenes.pack(side=LEFT, fill="both", expand=True)
+
+        lbl_ordenes = Label(frame_ordenes, text="Órdenes:", fg="#A6171C",
+                            bg="white", font=("Inter", 16))
+        lbl_ordenes.pack(anchor="w", pady=(0, 8))
+
         columns_ordenes = ('N_orden', 'ID', 'Fecha', 'Cliente', 'Total')
-        tabla_ordenes = ttk.Treeview(contenedor_principal, columns=columns_ordenes, show='headings', selectmode='browse', height=20)
-        tabla_ordenes.heading('N_orden', text='N. orden')
+        tabla_ordenes = ttk.Treeview(
+            frame_ordenes, columns=columns_ordenes,
+            show='headings', selectmode='browse', height=20
+        )
+
+        tabla_ordenes.heading('N_orden', text='N.')
         tabla_ordenes.heading('ID', text='ID')
         tabla_ordenes.heading('Fecha', text='Fecha')
         tabla_ordenes.heading('Cliente', text='Cliente')
         tabla_ordenes.heading('Total', text='Total')
-        tabla_ordenes.column('N_orden', width=80, anchor=CENTER)
+
+        tabla_ordenes.column('N_orden', width=70, anchor=CENTER)
         tabla_ordenes.column('ID', width=60, anchor=CENTER)
         tabla_ordenes.column('Fecha', width=100, anchor=CENTER)
-        tabla_ordenes.column('Cliente', width=120, anchor=W)
+        tabla_ordenes.column('Cliente', width=160, anchor=W)
         tabla_ordenes.column('Total', width=100, anchor=CENTER)
-        
-        vsb_ordenes = ttk.Scrollbar(contenedor_principal, orient="vertical", command=tabla_ordenes.yview)
-        tabla_ordenes.configure(yscrollcommand=vsb_ordenes.set)
-        tabla_ordenes.pack(side=LEFT, fill="both", expand=True, padx=(0, 10))
-        vsb_ordenes.pack(side=LEFT, fill="y")
-        
-        tabla_ordenes.tag_configure('odd', background='#FFFFFF')
-        tabla_ordenes.tag_configure('even', background='#F6F0E8')
-        
-        # ========== TABLA DE DETALLES (DERECHA) ==========
-        frame_detalles_titulo = Frame(contenedor_principal, bg="#D6D0C5")
-        frame_detalles_titulo.pack(side=RIGHT, fill="x", expand=False)
-        
-        lbl_detalles = Label(frame_detalles_titulo, text="Detalles de la orden:", font=("Inter", 16), fg="#A6171C", bg="#D6D0C5")
-        lbl_detalles.pack()
-        
-        # Tabla de detalles
+
+        vsb1 = ttk.Scrollbar(frame_ordenes, orient="vertical",
+                            command=tabla_ordenes.yview)
+        tabla_ordenes.configure(yscrollcommand=vsb1.set)
+
+        tabla_ordenes.pack(side=LEFT, fill=BOTH, expand=True)
+        vsb1.pack(side=LEFT, fill=Y)
+
+        # -------------------------------------------------------------
+        # TABLA DERECHA (60%)
+        # -------------------------------------------------------------
+        frame_detalles = Frame(cont_tablas, bg="white")
+        frame_detalles.pack(side=RIGHT, fill="both", expand=True, padx=(20, 0))
+
+        lbl_detalles = Label(frame_detalles, text="Detalles:",
+                            fg="#A6171C", bg="white", font=("Inter", 16))
+        lbl_detalles.pack(anchor="w", pady=(0, 8))
+
         columns_detalles = ('Cantidad', 'Producto', 'Precio Unit.', 'Subtotal')
-        tabla_detalles = ttk.Treeview(contenedor_principal, columns=columns_detalles, show='headings', height=20)
-        tabla_detalles.heading('Cantidad', text='Cantidad')
+        tabla_detalles = ttk.Treeview(
+            frame_detalles,
+            columns=columns_detalles,
+            show='headings', height=20
+        )
+
+        tabla_detalles.heading('Cantidad', text='Cant.')
         tabla_detalles.heading('Producto', text='Producto')
-        tabla_detalles.heading('Precio Unit.', text='Precio Unit.')
+        tabla_detalles.heading('Precio Unit.', text='Precio U.')
         tabla_detalles.heading('Subtotal', text='Subtotal')
+
         tabla_detalles.column('Cantidad', width=80, anchor=CENTER)
-        tabla_detalles.column('Producto', width=250, anchor=W)
-        tabla_detalles.column('Precio Unit.', width=100, anchor=CENTER)
-        tabla_detalles.column('Subtotal', width=100, anchor=CENTER)
-        
-        vsb_detalles = ttk.Scrollbar(contenedor_principal, orient="vertical", command=tabla_detalles.yview)
-        tabla_detalles.configure(yscrollcommand=vsb_detalles.set)
-        tabla_detalles.pack(side=RIGHT, fill="both", expand=True)
-        vsb_detalles.pack(side=RIGHT, fill="y")
-        
-        tabla_detalles.tag_configure('odd', background='#FFFFFF')
-        tabla_detalles.tag_configure('even', background='#F6F0E8')
-        
-        # Botón para buscar
-        btn_buscar = Button(header, text="Buscar", font=("Inter", 14), fg="#A6171C", bg="#F1C045", command=lambda: cargar_ordenes_por_fecha())
-        btn_buscar.pack(pady=5)
-        
-        # Definir funciones locales
+        tabla_detalles.column('Producto', width=260, anchor=W)
+        tabla_detalles.column('Precio Unit.', width=120, anchor=CENTER)
+        tabla_detalles.column('Subtotal', width=120, anchor=CENTER)
+
+        vsb2 = ttk.Scrollbar(frame_detalles, orient="vertical",
+                            command=tabla_detalles.yview)
+        tabla_detalles.configure(yscrollcommand=vsb2.set)
+
+        tabla_detalles.pack(side=LEFT, fill=BOTH, expand=True)
+        vsb2.pack(side=LEFT, fill=Y)
+
+        # -------------------------------------------------------------
+        # BOTÓN REGRESAR (REUBICADO Y REDIMENSIONADO)
+        # -------------------------------------------------------------
+        botones_frame = Frame(fondo_rojo, bg="#A6171C")
+        botones_frame.place(relx=0.5, rely=0.965, anchor="center")
+
+        Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 14),
+            fg="#A6171C",
+            bg="white",
+            relief="flat",
+            padx=10,
+            pady=4,
+            width=10,
+            command=lambda: self.menu_ordenes(ventana_ordenes)
+        ).pack()
+
+
+        # -------------------------------------------------------------
+        # LÓGICA ORIGINAL (NO MODIFICADA)
+        # -------------------------------------------------------------
         def cargar_ordenes_por_fecha():
-            """Carga las órdenes de la fecha seleccionada."""
             try:
                 ano = int(spinbox_ano.get())
                 mes = int(spinbox_mes.get())
                 dia = int(spinbox_dia.get())
                 fecha = datetime(ano, mes, dia).date()
-                
-                # Limpiar tabla de órdenes
-                for item in tabla_ordenes.get_children():
-                    tabla_ordenes.delete(item)
-                
-                # Limpiar tabla de detalles
-                for item in tabla_detalles.get_children():
-                    tabla_detalles.delete(item)
-                
+
+                # Limpiar ambas tablas
+                for i in tabla_ordenes.get_children():
+                    tabla_ordenes.delete(i)
+                for i in tabla_detalles.get_children():
+                    tabla_detalles.delete(i)
+
                 ordenes = metodos_ordenes.Ordenes_acciones.obtener_ordenes_por_fecha(fecha)
-                
+
                 if not ordenes:
-                    messagebox.showinfo("Información", f"No hay órdenes para la fecha {fecha}")
+                    messagebox.showinfo("Información", f"No hay órdenes para {fecha}")
                     return
-                
-                for contador, orden in enumerate(ordenes, 1):
-                    id_orden = orden[0]
-                    fecha_orden = orden[1]
-                    total = orden[2]
-                    cliente = orden[3]
-                    
+
+                for num, orden in enumerate(ordenes, 1):
+                    id_orden, fecha_orden, total, cliente = orden
                     try:
                         total_text = f"${float(total):.2f}"
                     except:
                         total_text = str(total)
-                    
-                    tag = 'even' if contador % 2 == 0 else 'odd'
-                    tabla_ordenes.insert('', 'end', values=(contador, id_orden, fecha_orden, cliente, total_text), tags=(tag,), iid=id_orden)
-            except ValueError as e:
-                messagebox.showerror("Error", "Por favor ingrese valores válidos para la fecha")
-        
+
+                    tag = 'even' if num % 2 == 0 else 'odd'
+                    tabla_ordenes.insert('', 'end',
+                                        values=(num, id_orden, fecha_orden, cliente, total_text),
+                                        tags=(tag,), iid=id_orden)
+
+            except:
+                messagebox.showerror("Error", "Por favor ingrese una fecha válida")
+
         def mostrar_detalles_orden(event=None):
-            """Muestra los detalles de la orden seleccionada."""
             seleccionado = tabla_ordenes.selection()
             if not seleccionado:
                 return
-            
+
             id_orden = seleccionado[0]
-            
-            # Limpiar tabla de detalles
-            for item in tabla_detalles.get_children():
-                tabla_detalles.delete(item)
-            
+
+            for i in tabla_detalles.get_children():
+                tabla_detalles.delete(i)
+
             try:
                 detalles = metodos_ordenes.Ordenes_acciones.obtener_detalles_orden(id_orden)
-                
+
                 if not detalles:
                     messagebox.showinfo("Información", "Esta orden no tiene detalles registrados")
                     return
-                
-                for contador, detalle in enumerate(detalles, 1):
-                    # detalle: (amount, id_product, product_name, unit_price, subtotal)
+
+                for n, detalle in enumerate(detalles, 1):
                     cantidad = detalle[0]
                     producto = detalle[2] if len(detalle) > 2 else detalle[1]
-                    precio = detalle[3] if len(detalle) > 3 else (detalle[2] if len(detalle) > 2 else 0)
+                    precio = detalle[3] if len(detalle) > 3 else 0
                     subtotal = detalle[4] if len(detalle) > 4 else 0
-                    
+
                     try:
-                        precio_text = f"${float(precio):.2f}"
-                        subtotal_text = f"${float(subtotal):.2f}"
+                        precio_t = f"${float(precio):.2f}"
+                        subt_t = f"${float(subtotal):.2f}"
                     except:
-                        precio_text = str(precio)
-                        subtotal_text = str(subtotal)
-                    
-                    tag = 'even' if contador % 2 == 0 else 'odd'
-                    tabla_detalles.insert('', 'end', values=(cantidad, producto, precio_text, subtotal_text), tags=(tag,))
+                        precio_t = str(precio)
+                        subt_t = str(subtotal)
+
+                    tag = "even" if n % 2 == 0 else "odd"
+                    tabla_detalles.insert('', 'end',
+                                        values=(cantidad, producto, precio_t, subt_t),
+                                        tags=(tag,))
             except Exception as e:
                 messagebox.showerror("Error", f"Error al cargar detalles: {e}")
-        
-        # Ligar evento de selección en tabla de órdenes
-        tabla_ordenes.bind('<<TreeviewSelect>>', mostrar_detalles_orden)
-        
-        # Frame de botones al final
-        frame_botones = Frame(fondo, bg="#D6D0C5")
-        frame_botones.pack(side=BOTTOM, fill=X, padx=50, pady=10)
-        
-        btn_regresar_det = Button(frame_botones, text="Regresar", font=("Inter", 18), fg="#A6171C", bg="#F1C045", command=lambda: self.menu_ordenes(ventana_ordenes))
-        btn_regresar_det.pack(side=RIGHT, padx=10)
-        
-        # Cargar órdenes del día actual al abrir
+
+        tabla_ordenes.bind("<<TreeviewSelect>>", mostrar_detalles_orden)
+
+        # Cargar fecha actual al abrir
         cargar_ordenes_por_fecha()
+
 
 
     

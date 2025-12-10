@@ -15,569 +15,686 @@ class interfacesProducto():
         for widget in ventana_login.winfo_children():
             widget.destroy()
 
-    def menu_producto(self,menu_productos):
+    def menu_producto(self, menu_productos):
         self.borrarPantalla(menu_productos)
-        fondo=Frame(menu_productos, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+
+        # -------------------------------------------
+        # Fondo general
+        # -------------------------------------------
+        fondo = Frame(menu_productos, bg="#F4F4F4")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # -------------------------------------------
+        # Contenedor central 85% del tamaño de la ventana
+        # -------------------------------------------
+        fondo2 = Frame(
+            fondo,
+            bg="#A6171C",
+            highlightbackground="#610E11",
+            highlightthickness=4
+        )
+        fondo2.place(relx=0.5, rely=0.5, anchor="center",
+                    relwidth=0.85, relheight=0.85)
 
-        lbl_titulo=Label(fondo2, text="Productos",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # -------------------------------------------
+        # TÍTULO
+        # -------------------------------------------
+        titulo_frame = Frame(fondo2, bg="#A6171C")
+        titulo_frame.place(relx=0.5, y=50, anchor="center")
 
-        contenedor_tabla=Frame(fondo2, width=2000, height=790)
-        contenedor_tabla.pack_propagate(False)
-        contenedor_tabla.pack(side=LEFT, padx=40, pady=20)
+        lbl_titulo = Label(
+            titulo_frame,
+            text="Productos",
+            font=("Orelega One", 52),
+            fg="white",
+            bg="#A6171C"
+        )
+        lbl_titulo.pack()
 
-        # --- Tabla de productos (Treeview) ---
+        # -------------------------------------------
+        # TARJETA DE LA TABLA
+        # -------------------------------------------
+        tabla_card = Frame(
+            fondo2,
+            bg="white",
+            highlightbackground="#C0C0C0",
+            highlightthickness=2
+        )
+        tabla_card.place(relx=0.5, rely=0.52, anchor="center",
+                        relwidth=0.90, relheight=0.70)
+
+        # -------------------------------------------
+        # Contenedor interno tabla
+        # -------------------------------------------
+        contenedor_tabla = Frame(tabla_card, bg="white")
+        contenedor_tabla.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # -------------------------------------------
+        # Treeview estilo
+        # -------------------------------------------
         style = ttk.Style()
-        style.theme_use('default')
-        style.configure('Treeview',foreground='black',rowheight=30,font=('Inter', 14))
-        style.configure('Treeview.Heading',background='#A6171C',foreground='#F1C045',font=('Orelega One', 16))
-        style.map('Treeview', background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
+        style.theme_use("default")
 
+        style.configure(
+            "Treeview",
+            background="white",
+            foreground="black",
+            rowheight=32,
+            font=('Inter', 14),
+            fieldbackground="white"
+        )
+
+        style.configure(
+            "Treeview.Heading",
+            background="#A6171C",
+            foreground="#FFFFFF",
+            font=('Orelega One', 15),
+            borderwidth=0
+        )
+
+        # -------------------------------------------
+        # ENCABEZADO
+        # -------------------------------------------
         columns = ('Id_producto', 'Nombre_producto', 'Categoria', 'Precio_unitario', 'Acciones')
-        header_frame = Frame(contenedor_tabla, bg='#A6171C')
-        header_frame.pack(fill='x', padx=20, pady=(10, 0))
-        header_frame.columnconfigure(0, weight=120)
-        header_frame.columnconfigure(1, weight=480)
-        header_frame.columnconfigure(2, weight=160)
-        header_frame.columnconfigure(3, weight=160)
-        header_frame.columnconfigure(4, weight=180)
 
-        lbl_h_id = Label(header_frame, text='Id_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
-        lbl_h_nombre = Label(header_frame, text='Nombre_producto', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='w')
-        lbl_h_categoria = Label(header_frame, text='Categoría', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
-        lbl_h_precio = Label(header_frame, text='Precio_unitario', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='e')
-        lbl_h_acciones = Label(header_frame, text='Acciones', bg='#A6171C', fg='#F1C045', font=('Orelega One', 16), anchor='center')
+        header_frame = Frame(contenedor_tabla, bg="#A6171C")
+        header_frame.pack(fill='x')
 
-        lbl_h_id.grid(row=0, column=0, sticky='we', padx=(4,2))
-        lbl_h_nombre.grid(row=0, column=1, sticky='we', padx=2)
-        lbl_h_categoria.grid(row=0, column=2, sticky='we', padx=2)
-        lbl_h_precio.grid(row=0, column=3, sticky='we', padx=2)
-        lbl_h_acciones.grid(row=0, column=4, sticky='we', padx=(2,4))
+        header_cfg = dict(bg="#A6171C", fg="white", font=('Orelega One', 15))
 
+        Label(header_frame, text='Id_producto', anchor='center', **header_cfg).grid(row=0, column=0, sticky='we')
+        Label(header_frame, text='Nombre_producto', anchor='w', **header_cfg).grid(row=0, column=1, sticky='we')
+        Label(header_frame, text='Categoría', anchor='center', **header_cfg).grid(row=0, column=2, sticky='we')
+        Label(header_frame, text='Precio_unitario', anchor='e', **header_cfg).grid(row=0, column=3, sticky='we')
+        Label(header_frame, text='Acciones', anchor='center', **header_cfg).grid(row=0, column=4, sticky='we')
+
+        header_frame.columnconfigure(0, weight=1)
+        header_frame.columnconfigure(1, weight=3)
+        header_frame.columnconfigure(2, weight=2)
+        header_frame.columnconfigure(3, weight=2)
+        header_frame.columnconfigure(4, weight=2)
+
+        # -------------------------------------------
+        # TABLA TREEVIEW
+        # -------------------------------------------
         tabla = ttk.Treeview(contenedor_tabla, columns=columns, show='', selectmode='browse')
-        tabla.column('Id_producto', width=120, anchor=CENTER)
-        tabla.column('Nombre_producto', width=480, anchor=W)
-        tabla.column('Categoria', width=160, anchor=CENTER)
-        tabla.column('Precio_unitario', width=160, anchor=E)
-        tabla.column('Acciones', width=180, anchor=CENTER)
+
+        tabla.column('Id_producto', anchor=CENTER)
+        tabla.column('Nombre_producto', anchor=W)
+        tabla.column('Categoria', anchor=CENTER)
+        tabla.column('Precio_unitario', anchor=E)
+        tabla.column('Acciones', anchor=CENTER)
 
         vsb = ttk.Scrollbar(contenedor_tabla, orient="vertical")
-        # comando personalizado para reposicionar botones al hacer scroll
+
         def _vsb_command(*args):
             tabla.yview(*args)
             try:
                 reposition_buttons()
-            except Exception:
+            except:
                 pass
 
         vsb.config(command=_vsb_command)
         tabla.configure(yscrollcommand=vsb.set)
-        tabla.pack(fill=BOTH, expand=True, padx=20, pady=10)
-        vsb.pack(side=RIGHT, fill=Y, pady=10, padx=(0,20))
 
-        # Estilo de filas alternadas
+        tabla.pack(fill=BOTH, expand=True, side=LEFT)
+        vsb.pack(side=RIGHT, fill=Y)
+
         tabla.tag_configure('odd', background='#FFFFFF')
-        tabla.tag_configure('even', background='#F6F0E8')
+        tabla.tag_configure('even', background='#F8F8F8')
 
-        # Cargar datos desde la base de datos usando el modelo
         productos = metodos_productos.Productos_acciones.mostrar_productos()
-        # contenedor para guardar referencias a botones por fila
         _row_buttons = {}
 
         def on_borrar(iid, pid, pname):
-            confirm = messagebox.askyesno("Confirmar eliminación", f"¿Desea eliminar el producto?\nID: {pid}\nNombre: {pname}")
+            confirm = messagebox.askyesno(
+                "Confirmar eliminación",
+                f"¿Desea eliminar el producto?\nID: {pid}\nNombre: {pname}"
+            )
             if not confirm:
                 return
 
             eliminado = metodos_productos.Productos_acciones.borrar(pid)
             if eliminado:
                 messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
-
                 try:
                     b_ed, b_del = _row_buttons.pop(iid, (None, None))
-                    if b_ed:
-                        b_ed.destroy()
-                    if b_del:
-                        b_del.destroy()
+                    if b_ed: b_ed.destroy()
+                    if b_del: b_del.destroy()
                     tabla.delete(iid)
                     reposition_buttons()
-                except Exception:
+                except:
                     pass
             else:
-                messagebox.showerror("Error", "No se pudo eliminar el producto. Verifique la conexión o los datos.")
+                messagebox.showerror("Error", "No se pudo eliminar el producto.")
 
-        # Handler para editar un producto: abre la interfaz de modificarProducto
         def on_editar(iid, producto_tuple):
-            # Abrir la vista de modificación pre-llenada con la tupla completa
-            # (id, nombre, precio, [categoria]) — si existe categoría la
-            # pasamos para que el formulario se precargue.
             try:
                 self.modificarProducto(menu_productos, producto_tuple)
             except Exception as e:
-                messagebox.showerror("Error", f"No se pudo abrir la ventana de modificación: {e}")
+                messagebox.showerror("Error", f"No se pudo abrir la ventana: {e}")
 
+        # -------------------------------------------
+        # LLENAR TABLA CON BOTONES
+        # -------------------------------------------
         for i, producto in enumerate(productos):
             precio = producto[3]
             try:
                 precio_text = f"{float(precio):.2f} MXN"
-            except Exception:
+            except:
                 precio_text = str(precio)
-            tag = 'even' if i % 2 == 0 else 'odd'
-            item_id = tabla.insert('', 'end', values=(producto[0], producto[1], producto[2], precio_text, ''), tags=(tag,))
 
-            btn_editar = Button(tabla, text='Editar', font=("Inter", 11), fg='#A6171C', bg='#F1F0EE', relief=RAISED, bd=1, padx=6, pady=2)
-            btn_borrar = Button(tabla, text='Borrar', font=("Inter", 11), fg='#FFFFFF', bg='#A6171C', relief=RAISED, bd=1, padx=6, pady=2)
-            # pass full producto tuple to the editor so it can populate category
+            tag = 'even' if i % 2 == 0 else 'odd'
+
+            item_id = tabla.insert('', 'end',
+                                values=(i+1, producto[1], producto[2], precio_text, ''),
+                                tags=(tag,))
+
+            btn_editar = Button(
+                tabla,
+                text='Editar',
+                font=("Inter", 9),
+                bg="white",
+                fg="#A6171C",
+                relief="solid",
+                bd=1,
+                highlightthickness=0
+            )
+
+            btn_borrar = Button(
+                tabla,
+                text='Borrar',
+                font=("Inter", 9),
+                bg="#A6171C",
+                fg="white",
+                relief="solid",
+                bd=1,
+                highlightthickness=0
+            )
+
             btn_editar.config(command=lambda iid=item_id, prod=producto: on_editar(iid, prod))
             btn_borrar.config(command=lambda iid=item_id, pid=producto[0], pname=producto[1]: on_borrar(iid, pid, pname))
+
             _row_buttons[item_id] = (btn_editar, btn_borrar)
 
-        # Forzar dibujo y posicionar los botones sobre cada celda 'Acciones'
         menu_productos.update_idletasks()
 
+        # -------------------------------------------
+        # Reposicionar botones dentro del Treeview
+        # -------------------------------------------
         def reposition_buttons():
             for iid, (b_ed, b_del) in _row_buttons.items():
                 try:
                     bbox = tabla.bbox(iid, column='Acciones')
-                except Exception:
+                except:
                     bbox = None
+
                 if not bbox:
-                    # ocultar si no está visible
                     b_ed.place_forget()
                     b_del.place_forget()
                     continue
+
                 x, y, width, height = bbox
-                # ajustar posiciones relativas dentro de la celda
-                btn_width = int(width * 0.45)
-                gap = 6
-                # colocar botones dentro del árbol usando coordenadas relativas al Treeview
-                b_ed.place(x=x + 4, y=y + 2, width=btn_width - gap, height=height - 4)
-                b_del.place(x=x + 4 + btn_width, y=y + 2, width=btn_width - gap, height=height - 4)
+                btn_width = int((width - 8) / 2)
+                b_ed.place(x=x+2, y=y+4, width=btn_width, height=height-8)
+                b_del.place(x=x+btn_width+6, y=y+4, width=btn_width, height=height-8)
 
         tabla.bind('<Configure>', lambda e: reposition_buttons())
         tabla.bind('<ButtonRelease-1>', lambda e: reposition_buttons())
-        tabla.bind('<Motion>', lambda e: None)
-        # rueda del ratón en Windows
-        tabla.bind_all('<MouseWheel>', lambda e: (reposition_buttons(), None))
+        tabla.bind_all('<MouseWheel>', lambda e: reposition_buttons())
 
         try:
             reposition_buttons()
-        except Exception:
+        except:
             pass
 
-        btn_agregarProducto=Button(contenedor_tabla, text="Agregar producto", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.nuevoProducto(menu_productos), width=22)
-        btn_agregarProducto.pack(padx=20, pady=10, fill="x", side=LEFT)
+        # -------------------------------------------
+        # BOTONES INFERIORES (REDUCIDOS)
+        # -------------------------------------------
+        botones_frame = Frame(fondo2, bg="#A6171C")
+        botones_frame.place(relx=0.5, rely=0.92, anchor="center")
 
-        btn_regresar=Button(contenedor_tabla, text="Regresar", font=("Inter", 24), fg="#A6171C", bg="#F1C045", command=lambda: self.regresar(menu_productos), width=22)
-        btn_regresar.pack(padx=20, pady=10, fill="x", side=RIGHT)
+        btn_agregarProducto = Button(
+            botones_frame,
+            text="Agregar producto",
+            font=("Inter", 16),
+            fg="white",
+            bg="#A6171C",
+            relief="flat",
+            padx=24,
+            pady=6,
+            width=18,
+            command=lambda: self.nuevoProducto(menu_productos)
+        )
+        btn_agregarProducto.grid(row=0, column=0, padx=25)
 
-    def nuevoProducto(self,nuevo_producto):
+        btn_regresar = Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 16),
+            fg="#A6171C",
+            bg="white",
+            relief="flat",
+            padx=24,
+            pady=6,
+            width=18,
+            command=lambda: self.regresar(menu_productos)
+        )
+        btn_regresar.grid(row=0, column=1, padx=25)
+
+
+
+    def nuevoProducto(self, nuevo_producto):
         self.borrarPantalla(nuevo_producto)
-        nuevo_producto.title("Nnuevo producto")
+        nuevo_producto.title("Nuevo producto")
         nuevo_producto.geometry("1920x1080")
         nuevo_producto.state("zoomed")
 
-        fondo=Frame(nuevo_producto, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+        # ===========================
+        # FONDO GENERAL ROJO (como nuevoUsuario)
+        # ===========================
+        fondo = Frame(nuevo_producto, bg="#A6171C")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # ===========================
+        # CONTENEDOR BLANCO CENTRADO
+        # ===========================
+        container = Frame(
+            fondo,
+            bg="white",
+            width=600,
+            height=750,
+            highlightbackground="#F1C045",
+            highlightthickness=4
+        )
+        container.place(relx=0.5, rely=0.5, anchor="center")
+        container.pack_propagate(False)
 
-        lbl_titulo=Label(fondo2, text="Nuevo producto",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # ===========================
+        # TÍTULO
+        # ===========================
+        lbl_titulo = Label(
+            container,
+            text="Nuevo producto",
+            font=("Orelega One", 42),
+            fg="#A6171C",
+            bg="white"
+        )
+        lbl_titulo.pack(pady=(40, 10))
 
-        desired_width = 1200
-        fondo3 = Frame(fondo2, bg="white", width=desired_width, height=700)
-        fondo3.pack_propagate(False)
-        # pack without fill so the white panel stays centered horizontally
-        # and sits under the title
-        fondo3.pack(padx=20, pady=10)
+        # ===========================
+        # FORM FRAME (scrollable pero manteniendo estilo)
+        # ===========================
+        form_container = Frame(container, bg="white")
+        form_container.pack(fill="both", expand=True)
 
-        # Canvas + scrollbar inside the white frame — only this area scrolls
-        canvas = Canvas(fondo3, bg="white", highlightthickness=0)
-        v_scroll = ttk.Scrollbar(fondo3, orient='vertical', command=canvas.yview)
-        canvas.configure(yscrollcommand=v_scroll.set)
-        v_scroll.pack(side=RIGHT, fill=Y)
+        canvas = Canvas(form_container, bg="white", highlightthickness=0)
+        scroll = ttk.Scrollbar(form_container, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scroll.set)
+
+        scroll.pack(side=RIGHT, fill=Y)
         canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        # Inner frame that will hold the actual form/widgets
-        inner = Frame(canvas, bg='white')
-        # Create a window inside the canvas to host the inner frame and keep
-        # a reference so we can resize it to match the canvas width.
-        inner_window = canvas.create_window((0, 0), window=inner, anchor='nw')
+        inner = Frame(canvas, bg="white")
+        canvas.create_window((0, 0), window=inner, anchor="nw")
 
-        # Update scrollregion when inner frame resizes
-        def _on_inner_configure(event=None):
-            canvas.configure(scrollregion=canvas.bbox('all'))
-            try:
-                # make the inner window match the visible canvas width so
-                # widgets expand correctly and there is no horizontal scroll
-                canvas.itemconfig(inner_window, width=canvas.winfo_width())
-            except Exception:
-                pass
+        def update_scroll(event=None):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+        inner.bind("<Configure>", update_scroll)
 
-        inner.bind('<Configure>', _on_inner_configure)
+        # ===========================
+        # CAMPOS DEL PRODUCTO
+        # ===========================
+        def formato_label(texto):
+            return Label(inner, text=texto, font=("Inter", 20), bg="white", anchor="w")
 
-        # Only scroll the canvas when mouse is over it
-        def _bind_to_mousewheel(event):
-            canvas.bind_all('<MouseWheel>', _on_mousewheel)
+        def formato_entry():
+            return Entry(inner, font=("Inter", 20), bg="#F7F7F7", relief="flat")
 
-        def _unbind_from_mousewheel(event):
-            canvas.unbind_all('<MouseWheel>')
+        # Nombre
+        formato_label("Nombre del producto").pack(anchor="w", padx=40, pady=(10, 0))
+        entry_nombre = formato_entry()
+        entry_nombre.pack(padx=40, pady=10, fill="x")
 
-        def _on_mousewheel(event):
-            # Windows scroll direction uses event.delta in multiples of 120
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), 'units')
+        # Precio
+        formato_label("Precio unitario").pack(anchor="w", padx=40, pady=(10, 0))
+        entry_precio = formato_entry()
+        entry_precio.pack(padx=40, pady=10, fill="x")
 
-        canvas.bind('<Enter>', _bind_to_mousewheel)
-        canvas.bind('<Leave>', _unbind_from_mousewheel)
+        # Categoría
+        formato_label("Categoría").pack(anchor="w", padx=40, pady=(10, 0))
+        categorias = ["Alimentos", "Bebida", "Especiales"]
+        combo_categoria = ttk.Combobox(inner, values=categorias, state="readonly", font=("Inter", 18))
+        combo_categoria.set(categorias[0])
+        combo_categoria.pack(padx=40, pady=10, fill="x")
 
-        # Keep the inner frame width in sync when the canvas is resized
-        def _on_canvas_configure(event):
-            try:
-                canvas.itemconfig(inner_window, width=event.width)
-            except Exception:
-                pass
+        # ===========================
+        # INGREDIENTES (checkbox + cantidad)
+        # ===========================
+        formato_label("Ingredientes").pack(anchor="w", padx=40, pady=(20, 10))
 
-        canvas.bind('<Configure>', _on_canvas_configure)
+        ingredientes = metodos_productos.Productos_acciones.obtener_ingredientes()
+        ingredientes_vars = []
+        ingredientes_entries = []
 
-        # adjust fondo3 height so it reaches close to the bottom of fondo2
-        def _adjust_fondo3_height():
-            try:
-                total = fondo2.winfo_height()
-                title_h = lbl_titulo.winfo_height()
-                # leave some padding at bottom and top
-                new_h = max(300, total - title_h - 80)
-                fondo3.configure(height=new_h)
-                # ensure the canvas item is updated after the change
-                canvas.update_idletasks()
-                _on_inner_configure()
-            except Exception:
-                pass
+        ingredientes_frame = Frame(inner, bg="white")
+        ingredientes_frame.pack(padx=20, pady=10)
 
-        # schedule an initial adjustment after widgets are drawn
-        fondo2.after(100, _adjust_fondo3_height)
+        columnas = 2  # mejor estética dentro del cuadro blanco
 
-        # place widgets inside the scrollable inner frame
-        lbl_nombre = Label(inner, text="Nombre del producto", font=("Inter", 24), bg="white")
-        lbl_nombre.pack(padx=20, pady=10)
+        for i, (id_ing, nombre) in enumerate(ingredientes):
+            fila = i // columnas
+            col = i % columnas
 
-        nombre_entry = Entry(inner, font=("Inter", 24), bg="white")
-        nombre_entry.pack(padx=20, pady=10)
+            # checkbox
+            var = IntVar(value=0)
+            chk = Checkbutton(
+                ingredientes_frame,
+                text=nombre,
+                variable=var,
+                onvalue=id_ing,
+                offvalue=0,
+                bg="white",
+                font=("Inter", 16),
+                anchor="w"
+            )
+            chk.grid(row=fila, column=col*2, sticky="w", padx=10, pady=5)
 
-        lbl_precio = Label(inner, text="Precio unitario", font=("Inter", 24), bg="white")
-        lbl_precio.pack(padx=20, pady=10)
+            # campo cantidad
+            ent = Entry(ingredientes_frame, width=5, font=("Inter", 14), bg="#F7F7F7", relief="flat")
+            ent.grid(row=fila, column=col*2 + 1, padx=5)
 
-        precio_entry = Entry(inner, font=("Inter", 24), bg="white")
-        precio_entry.pack(padx=20, pady=10)
-        
-        lbl_categoria = Label(inner, text="Categoría", font=("Inter", 24), bg="white")
-        lbl_categoria.pack(padx=20, pady=10)
-        # use a Combobox (dropdown) for category selection so user can only
-        # select one value easily
-        categories = ["Alimentos", "Bebida", "Especiales"]
-        combobox_categoria = ttk.Combobox(inner, values=categories, font=("Inter", 20), state='readonly')
-        combobox_categoria.set(categories[0])
-        combobox_categoria.pack(padx=20, pady=10)
+            ingredientes_vars.append(var)
+            ingredientes_entries.append(ent)
 
+        # ===========================
+        # GUARDAR PRODUCTO
+        # ===========================
         def on_agregar():
-            nombre = nombre_entry.get().strip()
-            precio = precio_entry.get().strip()
-            categoria = combobox_categoria.get().strip()
+            nombre = entry_nombre.get().strip()
+            precio = entry_precio.get().strip()
+            categoria = combo_categoria.get().strip()
 
-            if not nombre or not precio or not categoria:
-                messagebox.showwarning("Campos incompletos", "Completa todos los datos del producto.")
+            if not nombre or not precio:
+                messagebox.showerror("Error", "Completa todos los campos del producto.")
                 return
 
             try:
                 precio = float(precio)
-            except ValueError:
-                messagebox.showwarning("Precio inválido", "Ingresa un precio numérico válido.")
+            except:
+                messagebox.showerror("Error", "El precio debe ser numérico.")
                 return
-            ingredientes_seleccionados = []
 
+            ingredientes_sel = []
             for i, var in enumerate(ingredientes_vars):
-                id_ing = ingredientes[i][0]       
-                entry = ingredientes_entries[i]   
-                if var.get() == id_ing:           
-                    cantidad = entry.get().strip()
-
+                if var.get() != 0:
+                    cantidad = ingredientes_entries[i].get().strip()
                     if not cantidad.isdigit() or int(cantidad) <= 0:
-                        messagebox.showwarning("Cantidad inválida",f"La cantidad del ingrediente ID {id_ing} debe ser un número mayor a 0.")
+                        messagebox.showerror("Cantidad inválida", "Las cantidades deben ser números mayores a 0.")
                         return
+                    ingredientes_sel.append((var.get(), int(cantidad)))
 
-                    ingredientes_seleccionados.append((id_ing, int(cantidad)))
-            # Registrar producto
-            producto_id = metodos_productos.Productos_acciones.agregar(nombre, precio, categoria)
-
-            if not producto_id:
-                messagebox.showerror("Error", "No se pudo registrar el producto.")
+            nuevo_id = metodos_productos.Productos_acciones.agregar(nombre, precio, categoria)
+            if not nuevo_id:
+                messagebox.showerror("Error", "No se pudo registrar producto.")
                 return
 
-            # Registrar ingredientes del producto
-            if ingredientes_seleccionados:
-                ok = metodos_productos.Productos_acciones.agregar_ingredientes_detalle(
-                    producto_id,
-                    ingredientes_seleccionados  
-                )
+            if ingredientes_sel:
+                ok = metodos_productos.Productos_acciones.agregar_ingredientes_detalle(nuevo_id, ingredientes_sel)
                 if not ok:
-                    messagebox.showwarning("Advertencia", "El producto se registró, pero algunos ingredientes no se pudieron guardar.")
+                    messagebox.showerror("Advertencia", "Producto guardado, pero hubo errores con ingredientes.")
+
             messagebox.showinfo("Éxito", "Producto registrado correctamente.")
-        marco = Frame(inner, bg="white")
-        # === INGREDIENTES DESDE BD ===
-        ingredientes = metodos_productos.Productos_acciones.obtener_ingredientes()
+            self.menu_producto(nuevo_producto)
 
-        ingredientes_vars = []       
-        ingredientes_entries = []    
+        # ===========================
+        # BOTONES
+        # ===========================
+        botones_frame = Frame(inner, bg="white")
+        botones_frame.pack(pady=30)
 
-        lbl_ingredientes = Label(inner, text="Ingredientes", font=("Inter", 24), bg="white")
-        lbl_ingredientes.pack(padx=20, pady=10)
+        btn_regresar = Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 20),
+            bg="#F1C045",
+            fg="black",
+            activebackground="#D9A935",
+            relief="flat",
+            width=12,
+            command=lambda: self.menu_producto(nuevo_producto)
+        )
+        btn_regresar.grid(row=0, column=0, padx=20)
 
-        marco = Frame(inner, bg="white")
-        marco.pack(padx=20, pady=10)
+        btn_agregar = Button(
+            botones_frame,
+            text="Agregar",
+            font=("Inter", 20),
+            bg="#A6171C",
+            fg="white",
+            activebackground="#8F1318",
+            relief="flat",
+            width=12,
+            command=on_agregar
+        )
+        btn_agregar.grid(row=0, column=1, padx=20)
 
-        columnas = 3
-
-        for i, (id_ing, nombre) in enumerate(ingredientes):
-            
-            var = IntVar(value=0)  
-            chk = Checkbutton(marco,text=nombre,variable=var,onvalue=id_ing,offvalue=0,font=("Inter", 18),bg="white")
-            lbl_cantidad = Label(marco, text="Cantidad:", font=("Inter", 14), bg="white")
-            etr = Entry(marco, width=5, font=("Inter", 14))
-
-            fila = i // columnas
-            col_base = (i % columnas) * 3
-
-            chk.grid(row=fila, column=col_base, padx=10, pady=5, sticky="w")
-            lbl_cantidad.grid(row=fila, column=col_base + 1, padx=5, pady=5)
-            etr.grid(row=fila, column=col_base + 2, padx=5, pady=5)
-
-            ingredientes_vars.append(var)
-            ingredientes_entries.append(etr)
-
-        marco.pack(padx=20, pady=10)
-
-        btn_agregar = Button(inner, text="Agregar", font=("Inter", 24), bg="#F1C045", command=on_agregar)
-        btn_agregar.pack(padx=20, pady=10)
-        btn_regresar = Button(inner, text="Regresar", font=("Inter", 14), bg="#F1C045", command=lambda: self.menu_producto(nuevo_producto))
-        btn_regresar.pack(padx=10, pady=50)
 
     def modificarProducto(self, modificar_producto, producto=None):
- 
         self.borrarPantalla(modificar_producto)
         modificar_producto.title("Modificar producto")
         modificar_producto.geometry("1920x1080")
         modificar_producto.state("zoomed")
 
-        fondo=Frame(modificar_producto, bg="#D6D0C5")
-        fondo.pack_propagate(False)
+        # =====================================================
+        # FONDO ROJO (mismo estilo que nuevoProducto)
+        # =====================================================
+        fondo = Frame(modificar_producto, bg="#A6171C")
         fondo.pack(fill="both", expand=True)
 
-        fondo2=Frame(fondo, bg="#A6171C", width=1500, height=880)
-        fondo2.pack_propagate(False)
-        fondo2.pack(padx=99, pady=50)
+        # =====================================================
+        # CONTENEDOR BLANCO CENTRADO — MISMO DISEÑO
+        # =====================================================
+        container = Frame(
+            fondo,
+            bg="white",
+            width=650,
+            height=820,
+            highlightbackground="#F1C045",
+            highlightthickness=4
+        )
+        container.place(relx=0.5, rely=0.5, anchor="center")
+        container.pack_propagate(False)
 
-        lbl_titulo=Label(fondo2, text="Modificar producto",font=("Orelega One", 48), fg="#F1C045", bg="#A6171C")
-        lbl_titulo.pack(padx=20, pady=20)
+        # =====================================================
+        # TÍTULO
+        # =====================================================
+        lbl_titulo = Label(
+            container,
+            text="Modificar producto",
+            font=("Orelega One", 42),
+            fg="#A6171C",
+            bg="white"
+        )
+        lbl_titulo.pack(pady=(40, 10))
 
-        pid = None
-        initial_name = ""
-        initial_price = ""
-        if producto:
-            try:
-                pid = producto[0]
-                initial_name = producto[1]
-                initial_price = str(producto[3])
-            except Exception:
-                pid = None
+        # =====================================================
+        # CONTENEDOR SCROLLEABLE (igual que nuevoProducto)
+        # =====================================================
+        form_container = Frame(container, bg="white")
+        form_container.pack(fill="both", expand=True)
 
-        desired_width = 1200
-        fondo3 = Frame(fondo2, bg='white', width=desired_width, height=700)
-        fondo3.pack_propagate(False)
-        fondo3.pack(padx=20, pady=10)
+        canvas = Canvas(form_container, bg="white", highlightthickness=0)
+        scroll = ttk.Scrollbar(form_container, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scroll.set)
 
-        canvas_mod = Canvas(fondo3, bg='white', highlightthickness=0)
-        v_scroll_mod = ttk.Scrollbar(fondo3, orient='vertical', command=canvas_mod.yview)
-        canvas_mod.configure(yscrollcommand=v_scroll_mod.set)
-        v_scroll_mod.pack(side=RIGHT, fill=Y)
-        canvas_mod.pack(side=LEFT, fill=BOTH, expand=True)
+        scroll.pack(side=RIGHT, fill=Y)
+        canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        inner_mod = Frame(canvas_mod, bg='white')
-        inner_mod_window = canvas_mod.create_window((0, 0), window=inner_mod, anchor='nw')
+        inner = Frame(canvas, bg="white")
+        canvas.create_window((0, 0), window=inner, anchor="nw")
 
-        def _on_inner_mod_configure(event=None):
-            canvas_mod.configure(scrollregion=canvas_mod.bbox('all'))
-            try:
-                canvas_mod.itemconfig(inner_mod_window, width=canvas_mod.winfo_width())
-            except Exception:
-                pass
+        def update_scroll(event=None):
+            canvas.configure(scrollregion=canvas.bbox("all"))
 
-        inner_mod.bind('<Configure>', _on_inner_mod_configure)
+        inner.bind("<Configure>", update_scroll)
 
-        def _bind_to_mousewheel_mod(event):
-            canvas_mod.bind_all('<MouseWheel>', _on_mousewheel_mod)
+        # =====================================================
+        # ESTILO DE CONTROLES DEL FORMULARIO
+        # =====================================================
+        def formato_label(texto):
+            return Label(inner, text=texto, font=("Inter", 20), bg="white", anchor="w")
 
-        def _unbind_from_mousewheel_mod(event):
-            canvas_mod.unbind_all('<MouseWheel>')
+        def formato_entry():
+            return Entry(inner, font=("Inter", 20), bg="#F7F7F7", relief="flat")
 
-        def _on_mousewheel_mod(event):
-            canvas_mod.yview_scroll(int(-1 * (event.delta / 120)), 'units')
+        # =====================================================
+        # CARGA DE PRODUCTO
+        # =====================================================
+        pid = producto[0] if producto else None
+        initial_name = producto[1] if producto else ""
+        initial_category = producto[2] if producto else ""
+        initial_price = str(producto[3]) if producto else ""
 
-        canvas_mod.bind('<Enter>', _bind_to_mousewheel_mod)
-        canvas_mod.bind('<Leave>', _unbind_from_mousewheel_mod)
+        # =====================================================
+        # CAMPOS: Nombre
+        # =====================================================
+        formato_label("Nombre del producto").pack(anchor="w", padx=40, pady=(10, 0))
+        entry_nombre = formato_entry()
+        entry_nombre.insert(0, initial_name)
+        entry_nombre.pack(padx=40, pady=10, fill="x")
 
-        def _on_canvas_mod_configure(event):
-            try:
-                canvas_mod.itemconfig(inner_mod_window, width=event.width)
-            except Exception:
-                pass
+        # =====================================================
+        # Precio
+        # =====================================================
+        formato_label("Precio unitario").pack(anchor="w", padx=40, pady=(10, 0))
+        entry_precio = formato_entry()
+        entry_precio.insert(0, initial_price)
+        entry_precio.pack(padx=40, pady=10, fill="x")
 
-        canvas_mod.bind('<Configure>', _on_canvas_mod_configure)
+        # =====================================================
+        # Categoría
+        # =====================================================
+        formato_label("Categoría").pack(anchor="w", padx=40, pady=(10, 0))
 
-        def _adjust_fondo3_mod_height():
-            try:
-                total = fondo2.winfo_height()
-                title_h = lbl_titulo.winfo_height()
-                new_h = max(300, total - title_h - 80)
-                fondo3.configure(height=new_h)
-                canvas_mod.update_idletasks()
-                _on_inner_mod_configure()
-            except Exception:
-                pass
+        categorias = ["Alimentos", "Bebida", "Especiales"]
+        combo_categoria = ttk.Combobox(inner, values=categorias, state="readonly", font=("Inter", 18))
+        combo_categoria.set(initial_category if initial_category in categorias else categorias[0])
+        combo_categoria.pack(padx=40, pady=10, fill="x")
 
-        fondo2.after(100, _adjust_fondo3_mod_height)
-
-
-        initial_category = ""
-        try:
-            if producto and len(producto) > 2:
-                initial_category = producto[2] or ""
-        except Exception:
-            initial_category = ""
-
-        lbl_nombre = Label(inner_mod, text="Nombre del producto", font=("Inter", 24), bg="white")
-        lbl_nombre.pack(padx=20, pady=10)
-
-        nombre_entry = Entry(inner_mod, font=("Inter", 24), bg="white")
-        nombre_entry.insert(0, initial_name)
-        nombre_entry.pack(padx=20, pady=10)
-
-        lbl_precio = Label(inner_mod, text="Precio unitario", font=("Inter", 24), bg="white")
-        lbl_precio.pack(padx=20, pady=10)
-
-        precio_entry = Entry(inner_mod, font=("Inter", 24), bg="white")
-        precio_entry.insert(0, initial_price)
-        precio_entry.pack(padx=20, pady=10)
-
-        lbl_categoria_mod = Label(inner_mod, text="Categoría", font=("Inter", 24), bg="white")
-        lbl_categoria_mod.pack(padx=20, pady=10)
-        categories = ["Alimentos", "Bebida", "Especiales"]
-        combobox_categoria_mod = ttk.Combobox(inner_mod, values=categories, font=("Inter", 20), state='readonly')
-        combobox_categoria_mod.set(initial_category if initial_category in categories else categories[0])
-        combobox_categoria_mod.pack(padx=20, pady=10)
-
-        ingredientes_actuales = []
-        if pid:
-            ingredientes_actuales = metodos_productos.Productos_acciones.obtener_ingredientes_producto(pid)
+        # =====================================================
+        # INGREDIENTES
+        # =====================================================
+        formato_label("Ingredientes").pack(anchor="w", padx=40, pady=(20, 10))
 
         ingredientes = metodos_productos.Productos_acciones.obtener_ingredientes()
+        ingredientes_actuales = metodos_productos.Productos_acciones.obtener_ingredientes_producto(pid)
+        cantidades_existentes = metodos_productos.Productos_acciones.obtener_ingredientes_con_cantidad(pid)
 
         ingredientes_vars = []
 
-        lbl_ingredientes = Label(inner_mod, text="Ingredientes", font=("Inter", 24), bg="white")
-        lbl_ingredientes.pack(padx=20, pady=10)
+        ingredientes_frame = Frame(inner, bg="white")
+        ingredientes_frame.pack(padx=20, pady=10)
 
-        marco = Frame(inner_mod, bg="white")
-        marco.pack(padx=20, pady=10)
-        columnas = 3
-        # obtener mapa id -> cantidad (vacío si no hay)
-        ingredientes_con_cant = {}
-        if pid:
-            try:
-                ingredientes_con_cant = metodos_productos.Productos_acciones.obtener_ingredientes_con_cantidad(pid)
-            except Exception:
-                ingredientes_con_cant = {}
+        columnas = 2
 
-        ingredientes_vars = []
-
-        columnas = 3
         for i, (id_ing, nombre) in enumerate(ingredientes):
-            # valor inicial para el checkbox (1..n si pertenece, 0 si no)
+
+            fila = i // columnas
+            col = i % columnas
+
             valor_inicial = id_ing if id_ing in ingredientes_actuales else 0
             var = IntVar(value=valor_inicial)
 
-            chk = Checkbutton(marco,text=nombre,variable=var,onvalue=id_ing,offvalue=0,font=("Inter", 18),bg="white")
-            lbl_cantidad = Label(marco, text="Cantidad:", font=("Inter", 14), bg="white")
-            etr = Entry(marco, width=5, font=("Inter", 14))
-            # Si existe una cantidad guardada en BD, precargarla
-            if id_ing in ingredientes_con_cant:
-                try:
-                    etr.delete(0, "end")
-                    etr.insert(0, str(ingredientes_con_cant[id_ing]))
-                except Exception:
-                    pass
+            chk = Checkbutton(
+                ingredientes_frame,
+                text=nombre,
+                variable=var,
+                onvalue=id_ing,
+                offvalue=0,
+                bg="white",
+                font=("Inter", 16),
+                anchor="w"
+            )
+            chk.grid(row=fila, column=col*2, sticky="w", padx=10, pady=5)
 
-            fila = i // columnas
-            col_base = (i % columnas) * 3
+            ent = Entry(ingredientes_frame, width=5, font=("Inter", 14), bg="#F7F7F7", relief="flat")
+            ent.grid(row=fila, column=col*2 + 1, padx=5)
 
-            chk.grid(row=fila, column=col_base, padx=10, pady=5, sticky="w")
-            lbl_cantidad.grid(row=fila, column=col_base + 1, padx=5, pady=5)
-            etr.grid(row=fila, column=col_base + 2, padx=5, pady=5)
+            if id_ing in cantidades_existentes:
+                ent.insert(0, str(cantidades_existentes[id_ing]))
 
-            # guardamos en la estructura que usa el resto del código
-            ingredientes_vars.append({
-                "id": id_ing,
-                "var": var,
-                "cantidad": etr
-            })
+            ingredientes_vars.append((var, id_ing, ent))
 
+        # =====================================================
+        # ACCIÓN DE GUARDAR
+        # =====================================================
         def on_modificar():
-            nonlocal pid
-            nuevo_nombre = nombre_entry.get().strip()
-            precio_text = precio_entry.get().strip()
-            if not nuevo_nombre:
-                messagebox.showerror("Error", "El nombre no puede estar vacío.")
+            nombre = entry_nombre.get().strip()
+            precio = entry_precio.get().strip()
+            categoria = combo_categoria.get()
+
+            if not nombre or not precio:
+                messagebox.showerror("Error", "Completa todos los campos.")
                 return
+
             try:
-                nuevo_precio = float(precio_text)
-            except Exception:
-                messagebox.showerror("Error", "Precio inválido. Introduce un número válido.")
+                precio = float(precio)
+            except:
+                messagebox.showerror("Error", "Precio inválido.")
                 return
 
-            if pid is None:
-                messagebox.showerror("Error", "Id de producto desconocido. No se puede modificar.")
-                return
+            ok = metodos_productos.Productos_acciones.modificar_producto(nombre, precio, pid, categoria)
 
-            selected_category_mod = None
-            try:
-                selected_category_mod = combobox_categoria_mod.get()
-            except Exception:
-                selected_category_mod = None
+            nuevos_ing = []
+            for var, id_ing, ent in ingredientes_vars:
+                if var.get() != 0:
+                    cant = ent.get().strip()
+                    if not cant.isdigit() or int(cant) <= 0:
+                        messagebox.showerror("Error", "Cantidad inválida.")
+                        return
+                    nuevos_ing.append((id_ing, int(cant)))
 
-            modificado = metodos_productos.Productos_acciones.modificar_producto(nuevo_nombre, nuevo_precio, pid, selected_category_mod)
-            nuevos_ingredientes = [(item["id"], int(item["cantidad"].get()))
-            for item in ingredientes_vars
-            if item["var"].get() != 0]
-            metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ingredientes)
-            if modificado:
-                messagebox.showinfo("Éxito", "Producto modificado correctamente.")
+            metodos_productos.Productos_acciones.actualizar_ingredientes(pid, nuevos_ing)
+
+            if ok:
+                messagebox.showinfo("Éxito", "Producto modificado.")
                 self.menu_producto(modificar_producto)
             else:
-                messagebox.showerror("Error", "No se pudo modificar el producto. Verifique la conexión o los datos.")
+                messagebox.showerror("Error", "No se pudo modificar el producto.")
 
-        btn_agregar = Button(inner_mod, text="Guardar", font=("Inter", 24), bg="#F1C045", command=on_modificar)
-        btn_agregar.pack(padx=20, pady=10)
+        # =====================================================
+        # BOTONES — MISMO ESTILO QUE NUEVOPRODUCTO
+        # =====================================================
+        botones_frame = Frame(inner, bg="white")
+        botones_frame.pack(pady=30)
 
-        btn_regresar = Button(inner_mod, text="Regresar", font=("Inter", 14), bg="#F1C045", command=lambda: self.menu_producto(modificar_producto))
-        btn_regresar.pack(padx=20, pady=10)
+        btn_regresar = Button(
+            botones_frame,
+            text="Regresar",
+            font=("Inter", 20),
+            bg="#F1C045",
+            fg="black",
+            activebackground="#D9A935",
+            relief="flat",
+            width=12,
+            command=lambda: self.menu_producto(modificar_producto)
+        )
+        btn_regresar.grid(row=0, column=0, padx=20)
+
+        btn_guardar = Button(
+            botones_frame,
+            text="Guardar",
+            font=("Inter", 20),
+            bg="#A6171C",
+            fg="white",
+            activebackground="#8F1318",
+            relief="flat",
+            width=12,
+            command=on_modificar
+        )
+        btn_guardar.grid(row=0, column=1, padx=20)
+
 
     def regresar(self,menu_usuarios):
         menu_principal.interfacesMenu(menu_usuarios)
