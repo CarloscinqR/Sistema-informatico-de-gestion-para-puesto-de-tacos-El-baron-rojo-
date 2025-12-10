@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-12-2025 a las 15:42:25
+-- Tiempo de generación: 10-12-2025 a las 01:04:38
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -75,8 +75,6 @@ CREATE TABLE `ingredients_details` (
 --
 
 INSERT INTO `ingredients_details` (`id_ingredientsdetail`, `id_ingredients`, `id_product`, `quantity`) VALUES
-(32, 2, 1, 1),
-(33, 3, 1, 30),
 (34, 2, 2, 1),
 (35, 4, 2, 30),
 (36, 1, 3, 1),
@@ -86,9 +84,24 @@ INSERT INTO `ingredients_details` (`id_ingredientsdetail`, `id_ingredients`, `id
 (40, 2, 5, 1),
 (41, 3, 5, 20),
 (42, 5, 5, 15),
-(43, 2, 6, 1),
-(44, 4, 6, 20),
-(45, 5, 6, 15);
+(52, 2, 6, 1),
+(53, 4, 6, 20),
+(54, 5, 6, 15),
+(58, 2, 1, 1),
+(59, 3, 1, 30),
+(60, 1, 8, 1),
+(61, 4, 8, 75),
+(62, 5, 8, 50),
+(63, 1, 7, 1),
+(64, 3, 7, 75),
+(65, 5, 7, 50),
+(67, 1, 9, 2),
+(68, 3, 9, 100),
+(69, 4, 9, 100),
+(70, 2, 10, 10),
+(71, 3, 10, 75),
+(72, 4, 10, 75),
+(73, 5, 10, 30);
 
 -- --------------------------------------------------------
 
@@ -128,7 +141,11 @@ INSERT INTO `products` (`id_product`, `product_name`, `products_category`, `unit
 (5, 'Volcan de asada', 'Alimentos', 25.00),
 (6, 'Volcan de adobada', 'Alimentos', 25.00),
 (7, 'Gringa de asada', 'Alimentos', 80.00),
-(8, 'Gringa de adobada', 'Alimentos', 80.00);
+(8, 'Gringa de adobada', 'Alimentos', 80.00),
+(9, 'El BB', 'Especiales', 140.00),
+(10, 'Alambre el baron', 'Especiales', 125.00),
+(11, 'Refresco', 'Bebida', 25.00),
+(12, 'Agua natural', 'Bebida', 15.00);
 
 -- --------------------------------------------------------
 
@@ -220,7 +237,7 @@ ALTER TABLE `ingredients`
 -- AUTO_INCREMENT de la tabla `ingredients_details`
 --
 ALTER TABLE `ingredients_details`
-  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT de la tabla `orders`
@@ -232,7 +249,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT de la tabla `products`
 --
 ALTER TABLE `products`
-  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `user`
