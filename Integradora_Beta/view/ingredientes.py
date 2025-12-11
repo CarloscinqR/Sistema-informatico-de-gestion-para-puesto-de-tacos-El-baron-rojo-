@@ -10,6 +10,11 @@ from controller.funciones import Validadores
 # Admin password
 ADMIN_PASSWORD = os.getenv('TACOS_ADMIN_PASSWORD', '1234')
 
+# Función para validar unidad (solo letras y espacios)
+def validate_unit_input(char):
+    """Retorna True si el carácter es letra o espacio."""
+    return char.isalpha() or char.isspace()
+
 
 class interfacesIngrediente():
     def __init__(self, menu_ingredientes):
@@ -400,12 +405,16 @@ class interfacesIngrediente():
         ).pack(anchor="w", padx=40)
 
         unit = StringVar()
+        # Registrar validador para Entry (solo letras y espacios)
+        vcmd_unit = (nuevo_ingrediente.register(lambda s: all(validate_unit_input(c) for c in s)), '%S')
         ent_unit = Entry(
             form_frame,
             font=("Inter", 20),
             bg="#F7F7F7",
             relief="flat",
-            textvariable=unit
+            textvariable=unit,
+            validate="key",
+            validatecommand=vcmd_unit
         )
         ent_unit.pack(padx=40, pady=(0, 25), ipady=5, fill="x")
 
@@ -559,11 +568,15 @@ class interfacesIngrediente():
             bg="white"
         ).pack(anchor="w", padx=40)
 
+        # Registrar validador para Entry (solo letras y espacios)
+        vcmd_unit = (modificar_ingrediente.register(lambda s: all(validate_unit_input(c) for c in s)), '%S')
         ent_unit = Entry(
             form_frame,
             font=("Inter", 20),
             bg="#F7F7F7",
-            relief="flat"
+            relief="flat",
+            validate="key",
+            validatecommand=vcmd_unit
         )
         ent_unit.insert(0, unit)
         ent_unit.pack(padx=40, pady=(0, 25), ipady=5, fill="x")
