@@ -408,6 +408,26 @@ class interfacesUsuario():
             command=lambda: self.menu_usuario(nuevo_usuario)
         )
         btn_regresar.grid(row=0, column=0, padx=20)
+        # Acción para agregar usuario con validaciones locales
+        def on_add():
+            name = nomb.get().strip()
+            pass1 = contrasenia_entry.get().strip()
+            pass2 = contrasenia2_entry.get().strip()
+            role = rol_cbx.get().strip()
+
+            if not name:
+                messagebox.showerror("Error", "El nombre no puede estar vacío.")
+                return
+            if not pass1:
+                messagebox.showerror("Error", "La contraseña no puede estar vacía.")
+                return
+            if pass1 != pass2:
+                messagebox.showerror("Error", "Las contraseñas no coinciden.")
+                return
+
+            # Llamar al método del modelo y mostrar resultado usando el helper
+            resultado = metodos_usuarios.Usuarios_acciones.agregar(name, pass1, pass2, role)
+            funciones.Controladores.respuesta_sql("Agregar usuario", resultado)
 
         # Botón Agregar
         btn_agregar = Button(
@@ -419,9 +439,7 @@ class interfacesUsuario():
             activebackground="#8F1318",
             relief="flat",
             width=12,
-            command=lambda: funciones.Controladores.respuesta_sql(
-                "Agregar usuario", metodos_usuarios.Usuarios_acciones.agregar(nomb.get(), contr.get(), contr2.get(), rol_cbx.get().strip())
-            )
+            command=on_add
         )
         btn_agregar.grid(row=0, column=1, padx=20)
 
