@@ -1,5 +1,6 @@
 from tkinter import *
 from view import user,ordenes,productos,ingredientes
+from controller import funciones
 
 class interfacesMenu():
     def __init__(self,ventana_menu):
@@ -63,6 +64,27 @@ class interfacesMenu():
             **estilo_boton
         )
         btn_orden.pack(padx=20, pady=12, fill="x")
+
+        # Obtener rol actual (guardado en controller.funciones por el login)
+        current_role = None
+        try:
+            current_role = funciones.get_current_user_role()
+        except Exception:
+            try:
+                current_role = funciones.current_user_role
+            except Exception:
+                current_role = None
+
+        # Si el usuario es 'Empleado', solo mostrar el botón Órdenes y Salir
+        if current_role == 'Empleado':
+            btn_salir = Button(
+                contenedor_botones,
+                text="Salir",
+                command=ventana_menu.quit,
+                **estilo_boton
+            )
+            btn_salir.pack(padx=20, pady=12, fill="x")
+            return
 
         btn_productos = Button(
             contenedor_botones,

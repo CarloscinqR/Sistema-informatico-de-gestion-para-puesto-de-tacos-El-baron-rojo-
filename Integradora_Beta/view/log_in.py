@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from view import menu_principal
 from model import metodos_usuarios
+from controller import funciones
 
 class InterfacesLogin():
     def __init__(self,ventana_login):
@@ -115,6 +116,21 @@ class InterfacesLogin():
                 )
 
                 if verification:
+                    # verification es la tupla del usuario; el rol suele estar en la posición 6
+                    try:
+                        user_role = verification[6]
+                    except Exception:
+                        user_role = None
+
+                    # guardar rol en controlador global
+                    try:
+                        funciones.set_current_user_role(user_role)
+                    except Exception:
+                        try:
+                            funciones.current_user_role = user_role
+                        except:
+                            pass
+
                     self.borrarPantalla(ventana_login)
                     menu_principal.interfacesMenu(ventana_login)
                 else:

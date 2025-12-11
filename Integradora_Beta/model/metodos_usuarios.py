@@ -80,15 +80,29 @@ class Usuarios_acciones():
     def verificar_usuario(username,password):
         password=hashlib.sha256(password.encode()).hexdigest()
         try:
+            # Buscar por usuario+password y obtener todos los campos
             conexionBD.cursor.execute(
                 "SELECT * FROM user WHERE username=%s AND password=%s",
                 (username,password)
             )
-            fila_encontrada = conexionBD.cursor.fetchone()
-            if fila_encontrada is not None:
-                return True
-            else:
-                messagebox.showerror("Error",f"Usuario o Contraseña incorrectos")
+            fila = conexionBD.cursor.fetchone()
+            if fila is None:
+                # credenciales incorrectas
+                messagebox.showerror("Error", "Usuario o Contraseña incorrectos")
+                return False
+
+            # campo 'status' esperado en posición 5
+            try:
+                status_int = int(fila[5])
+            except Exception:
+                status_int = 0
+
+            if status_int == 0:
+                messagebox.showerror("Error", "Este usuario ha sido eliminado y no puede iniciar sesión.")
+                return False
+
+            # Retornar la fila completa para que el llamador conozca el rol
+            return fila
         except Exception as e:
             messagebox.showerror("Error",f"Error al verificar: {e}")
             return False

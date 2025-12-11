@@ -4,6 +4,8 @@ from tkinter import ttk
 from tkinter import messagebox, simpledialog
 from view import menu_principal
 from model import metodos_ingredientes, metodos_productos
+from controller import funciones
+from controller.funciones import Validadores
 
 # Admin password
 ADMIN_PASSWORD = os.getenv('TACOS_ADMIN_PASSWORD', '1234')
@@ -414,11 +416,16 @@ class interfacesIngrediente():
             name = ent_nombre.get().strip()
             unit_text = ent_unit.get().strip()
 
-            if not name:
-                messagebox.showerror("Error", "El nombre es requerido.")
+            # Validar nombre
+            es_valido, mensaje = Validadores.validar_nombre(name)
+            if not es_valido:
+                messagebox.showerror("Error", f"Nombre inválido: {mensaje}")
                 return
-            if not unit_text:
-                messagebox.showerror("Error", "La unidad de medida es requerida.")
+
+            # Validar unidad de medida
+            es_valido, mensaje = Validadores.validar_unidad_medida(unit_text)
+            if not es_valido:
+                messagebox.showerror("Error", f"Unidad de medida inválida: {mensaje}")
                 return
 
             new_id = metodos_ingredientes.Ingredientes_acciones.agregar(name, unit_text)
@@ -568,11 +575,16 @@ class interfacesIngrediente():
             new_name = ent_nombre.get().strip()
             new_unit = ent_unit.get().strip()
 
-            if not new_name:
-                messagebox.showerror("Error", "El nombre es requerido.")
+            # Validar nombre
+            es_valido, mensaje = Validadores.validar_nombre(new_name)
+            if not es_valido:
+                messagebox.showerror("Error", f"Nombre inválido: {mensaje}")
                 return
-            if not new_unit:
-                messagebox.showerror("Error", "La unidad de medida es requerida.")
+            
+            # Validar unidad de medida
+            es_valido, mensaje = Validadores.validar_unidad_medida(new_unit)
+            if not es_valido:
+                messagebox.showerror("Error", f"Unidad de medida inválida: {mensaje}")
                 return
 
             res = metodos_ingredientes.Ingredientes_acciones.modificar(new_name, new_unit, id_ingredient)

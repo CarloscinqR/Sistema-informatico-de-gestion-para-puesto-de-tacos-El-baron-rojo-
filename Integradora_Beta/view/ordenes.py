@@ -357,6 +357,10 @@ class interfacesOrdenes():
             return
 
         id_orden = seleccionado[0]
+        # Confirmación antes de proceder a la edición
+        confirmar = messagebox.askyesno("Confirmar modificación", "¿Estás seguro que quieres modificar la orden?")
+        if not confirmar:
+            return
         # abrir la pantalla de nueva orden
         self.nuevaOrden(ventana)
         try:

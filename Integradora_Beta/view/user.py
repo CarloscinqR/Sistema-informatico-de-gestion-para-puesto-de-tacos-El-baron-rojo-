@@ -176,8 +176,24 @@ class interfacesUsuario():
             else:
                 messagebox.showerror("Error", "No se pudo eliminar al usuario.")
 
-        def on_editar(iid, uid, uname, upassw, urol):
+        def on_editar(iid, user_row):
             try:
+                # user_row expected columns: (id_user, username, password, creation_date, delete_date, status, role)
+                status = None
+                try:
+                    status = int(user_row[5])
+                except Exception:
+                    status = 0
+
+                if status == 0:
+                    messagebox.showwarning("Atención", "No se puede modificar un usuario eliminado.")
+                    return
+
+                uid = user_row[0]
+                uname = user_row[1]
+                upassw = user_row[2]
+                urol = user_row[6] if len(user_row) > 6 else ''
+
                 self.modificarUsuario(menu_usuarios, (uid, uname, upassw, urol))
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir la ventana: {e}")
@@ -195,31 +211,42 @@ class interfacesUsuario():
                 tags=(tag,)
             )
 
-            btn_editar = Button(
-                tabla,
-                text='Editar',
-                font=("Inter", 9),
-                bg="white",
-                fg="#A6171C",
-                relief="solid",
-                bd=1,
-                highlightthickness=0,
-                command=lambda iid=item_id, u=user: on_editar(iid, u[0], u[1], u[2], u[6])
-            )
+            # Determinar estado del usuario (status)
+            try:
+                status_val = int(user[5])
+            except Exception:
+                status_val = 0
 
-            btn_borrar = Button(
-                tabla,
-                text='Borrar',
-                font=("Inter", 9),
-                bg="#A6171C",
-                fg="white",
-                relief="solid",
-                bd=1,
-                highlightthickness=0,
-                command=lambda iid=item_id, u=user: on_borrar(iid, u[0], u[1])
-            )
+            # Crear botones sólo si el usuario NO está eliminado (status != 0)
+            if status_val != 0:
+                btn_editar = Button(
+                    tabla,
+                    text='Editar',
+                    font=("Inter", 9),
+                    bg="white",
+                    fg="#A6171C",
+                    relief="solid",
+                    bd=1,
+                    highlightthickness=0,
+                    command=lambda iid=item_id, u=user: on_editar(iid, u)
+                )
 
-            _row_buttons[item_id] = (btn_editar, btn_borrar)
+                btn_borrar = Button(
+                    tabla,
+                    text='Borrar',
+                    font=("Inter", 9),
+                    bg="#A6171C",
+                    fg="white",
+                    relief="solid",
+                    bd=1,
+                    highlightthickness=0,
+                    command=lambda iid=item_id, u=user: on_borrar(iid, u[0], u[1])
+                )
+
+                _row_buttons[item_id] = (btn_editar, btn_borrar)
+            else:
+                # Usuario eliminado: no crear botones (ocultos)
+                _row_buttons[item_id] = (None, None)
 
         menu_usuarios.update_idletasks()
 
@@ -234,14 +261,26 @@ class interfacesUsuario():
                     bbox = None
 
                 if not bbox:
-                    b_ed.place_forget()
-                    b_del.place_forget()
+                    if b_ed:
+                        try: b_ed.place_forget()
+                        except: pass
+                    if b_del:
+                        try: b_del.place_forget()
+                        except: pass
                     continue
 
                 x, y, width, height = bbox
                 btn_width = int((width - 16) / 2)  # Más espacio lateral
-                b_ed.place(x=x+2, y=y+4, width=btn_width, height=height-8)
-                b_del.place(x=x+btn_width+6, y=y+4, width=btn_width, height=height-8)
+                if b_ed:
+                    try:
+                        b_ed.place(x=x+2, y=y+4, width=btn_width, height=height-8)
+                    except:
+                        pass
+                if b_del:
+                    try:
+                        b_del.place(x=x+btn_width+6, y=y+4, width=btn_width, height=height-8)
+                    except:
+                        pass
 
         tabla.bind('<Configure>', lambda e: reposition_buttons())
         tabla.bind('<ButtonRelease-1>', lambda e: reposition_buttons())
