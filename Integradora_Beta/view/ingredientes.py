@@ -89,7 +89,7 @@ class interfacesIngrediente():
             font=('Orelega One', 15),
             borderwidth=0
         )
-        style.map("Treeview", background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
+        style.map("Treeview", background=[('selected', '#FF5E5E')], foreground=[('selected', 'black')])
 
         # -------------------------------------------
         # Encabezado (barra roja)
@@ -446,20 +446,20 @@ class interfacesIngrediente():
             width=12,
             command=on_save
         )
-        btn_save.grid(row=0, column=0, padx=20)
+        btn_save.grid(row=0, column=1, padx=20)
 
         btn_cancel = Button(
             botones_frame,
             text="Cancelar",
             font=("Inter", 20),
-            bg="#F1C045",
+            bg="#FFFFFF",
             fg="black",
-            activebackground="#D9A935",
+            activebackground="#ABABAB",
             relief="flat",
             width=12,
             command=lambda: self.menu_ingrediente(nuevo_ingrediente)
         )
-        btn_cancel.grid(row=0, column=1, padx=20)
+        btn_cancel.grid(row=0, column=0, padx=20)
 
 
     def modificarIngrediente(self, modificar_ingrediente, id_ingredient):
@@ -606,20 +606,20 @@ class interfacesIngrediente():
             width=12,
             command=on_update
         )
-        btn_save.grid(row=0, column=0, padx=20)
+        btn_save.grid(row=0, column=1, padx=20)
 
         btn_cancel = Button(
             botones_frame,
             text="Cancelar",
             font=("Inter", 20),
-            bg="#F1C045",
+            bg="#FFFFFF",
             fg="black",
-            activebackground="#D9A935",
+            activebackground="#ABABAB",
             relief="flat",
             width=12,
             command=lambda: self.menu_ingrediente(modificar_ingrediente)
         )
-        btn_cancel.grid(row=0, column=1, padx=20)
+        btn_cancel.grid(row=0, column=0, padx=20)
 
 
     def regresar(self, menu_usuarios):

@@ -88,7 +88,7 @@ class interfacesOrdenes():
             font=('Orelega One', 15),
             borderwidth=0
         )
-        style.map("Treeview", background=[('selected', '#F1C045')], foreground=[('selected', 'black')])
+        style.map("Treeview", background=[('selected', "#FF5E5E")], foreground=[('selected', 'black')])
 
         # -------------------------------
         # Encabezado personalizado
@@ -754,7 +754,7 @@ class interfacesOrdenes():
         style.configure('Treeview', foreground='black', rowheight=26, font=('Inter', 13))
         style.configure('Treeview.Heading', background='#A6171C',
                         foreground='white', font=('Orelega One', 14))
-        style.map('Treeview', background=[('selected', '#F1C045')],
+        style.map('Treeview', background=[('selected', '#FF5E5E')],
                 foreground=[('selected', 'black')])
 
         # -------------------------------------------------------------

@@ -91,6 +91,7 @@ class interfacesUsuario():
             font=('Orelega One', 15),
             borderwidth=0
         )
+        style.map("Treeview", background=[('selected', '#FF5E5E')], foreground=[('selected', 'black')])
 
         # -------------------------------------------
         # ENCABEZADO
@@ -324,7 +325,7 @@ class interfacesUsuario():
         # --- Nombre ---
         Label(form_frame, text="Nombre", font=("Inter", 20), bg="white").pack(anchor="w", padx=40)
         nomb = StringVar()
-        nombre_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat")
+        nombre_entry = Entry(form_frame, font=("Inter", 20), bg="#F7F7F7", relief="flat",textvariable=nomb)
         nombre_entry.pack(padx=40, pady=(0, 15), ipady=5, fill="x")
 
         # --- Contraseña ---
@@ -360,9 +361,9 @@ class interfacesUsuario():
             botones_frame,
             text="Regresar",
             font=("Inter", 20),
-            bg="#F1C045",
+            bg="#FFFFFF",
             fg="black",
-            activebackground="#D9A935",
+            activebackground="#ABABAB",
             relief="flat",
             width=12,
             command=lambda: self.menu_usuario(nuevo_usuario)
@@ -380,10 +381,7 @@ class interfacesUsuario():
             relief="flat",
             width=12,
             command=lambda: funciones.Controladores.respuesta_sql(
-                "Agregar usuario",
-                metodos_usuarios.Usuarios_acciones.agregar(
-                    nomb.get(), contr.get(), contr2.get(), rol_cbx.get()
-                )
+                "Agregar usuario", metodos_usuarios.Usuarios_acciones.agregar(nomb.get(), contr.get(), contr2.get(), rol_cbx.get().strip())
             )
         )
         btn_agregar.grid(row=0, column=1, padx=20)
@@ -524,21 +522,21 @@ class interfacesUsuario():
             width=12,
             command=on_modificar
         )
-        btn_modificar.grid(row=0, column=0, padx=20)
+        btn_modificar.grid(row=0, column=1, padx=20)
 
         # Botón Regresar
         btn_regresar = Button(
             botones_frame,
             text="Regresar",
             font=("Inter", 20),
-            bg="#F1C045",
+            bg="#FFFFFF",
             fg="black",
-            activebackground="#D9A935",
+            activebackground="#ABABAB",
             relief="flat",
             width=12,
             command=lambda: self.menu_usuario(modificar_usuario)
         )
-        btn_regresar.grid(row=0, column=1, padx=20)
+        btn_regresar.grid(row=0, column=0, padx=20)
 
 
     def regresar(self,menu_usuarios):

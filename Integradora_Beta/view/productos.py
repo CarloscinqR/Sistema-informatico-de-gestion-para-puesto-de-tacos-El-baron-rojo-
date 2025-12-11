@@ -91,6 +91,7 @@ class interfacesProducto():
             font=('Orelega One', 15),
             borderwidth=0
         )
+        style.map("Treeview", background=[('selected', "#FF5E5E")], foreground=[('selected', 'black')])
 
         # -------------------------------------------
         # ENCABEZADO
@@ -457,9 +458,9 @@ class interfacesProducto():
             botones_frame,
             text="Regresar",
             font=("Inter", 20),
-            bg="#F1C045",
+            bg="#FFFFFF",
             fg="black",
-            activebackground="#D9A935",
+            activebackground="#ABABAB",
             relief="flat",
             width=12,
             command=lambda: self.menu_producto(nuevo_producto)
@@ -673,9 +674,9 @@ class interfacesProducto():
             botones_frame,
             text="Regresar",
             font=("Inter", 20),
-            bg="#F1C045",
+            bg="#FFFFFF",
             fg="black",
-            activebackground="#D9A935",
+            activebackground="#ABABAB",
             relief="flat",
             width=12,
             command=lambda: self.menu_producto(modificar_producto)

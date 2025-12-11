@@ -7,9 +7,11 @@ import hashlib
 class Usuarios_acciones():
     @staticmethod
     def agregar(username,password,password2,role):
+        print(username)
         if password==password2:
             try:
                 password=hashlib.sha256(password.encode()).hexdigest()
+                print(password)
                 conexionBD.cursor.execute(
                     "insert into user (id_user,username,password,creation_date,delete_date,status,role) values (null,%s, %s,NOW(),0000-00-00,1,%s)",
                     (username,password,role)
