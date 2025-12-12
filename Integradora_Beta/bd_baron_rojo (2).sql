@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-12-2025 a las 22:32:10
+-- Tiempo de generación: 12-12-2025 a las 03:46:38
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `bd_baron_rojo`
 --
+CREATE DATABASE IF NOT EXISTS `bd_baron_rojo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `bd_baron_rojo`;
 
 -- --------------------------------------------------------
 
@@ -142,7 +144,7 @@ INSERT INTO `orders` (`id_order`, `date`, `total`, `costumer_name`) VALUES
 
 CREATE TABLE `products` (
   `id_product` int(11) NOT NULL,
-  `product_name` varchar(60) NOT NULL,
+  `product_name` varchar(20) NOT NULL,
   `products_category` varchar(15) NOT NULL,
   `unit_price` double(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -189,7 +191,10 @@ INSERT INTO `user` (`id_user`, `username`, `password`, `creation_date`, `delete_
 (1, 'admin', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-11-14', '0000-00-00', 1, 'Administrador'),
 (2, 'Carlos', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-07', '0000-00-00', 1, 'Administrador'),
 (3, 'Jose', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-07', '2025-12-07', 0, 'Empleado'),
-(5, '', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '2025-12-09', '2025-12-10', 0, 'Administrador');
+(19, 'Emi', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-10', '0000-00-00', 1, 'Empleado'),
+(20, 'Cardiel', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', '2025-12-10', '0000-00-00', 1, 'Empleado'),
+(21, 'Mauricio', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-10', '2025-12-10', 0, 'Administrador'),
+(23, 'Luis', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '2025-12-10', '0000-00-00', 1, 'Empleado');
 
 --
 -- Índices para tablas volcadas
@@ -244,37 +249,37 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `detail_order`
 --
 ALTER TABLE `detail_order`
-  MODIFY `id_detail_order` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_detail_order` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `ingredients`
 --
 ALTER TABLE `ingredients`
-  MODIFY `id_ingredients` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_ingredients` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `ingredients_details`
 --
 ALTER TABLE `ingredients_details`
-  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id_ingredientsdetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT de la tabla `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id_order` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_order` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `products`
 --
 ALTER TABLE `products`
-  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Restricciones para tablas volcadas
